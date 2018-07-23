@@ -14,7 +14,6 @@ class DownloadService():
         else:
             self.path = path
 
-
         self.api = auth()
 
         try:
