@@ -1,19 +1,19 @@
 import os
 from tqdm import tqdm
 from auth import auth
-import pickle
 import requests
-from sys import exit
+from multiprocessing import Pool, cpu_count
 
 
 class DownloadService():
 
-    def __init__(self, user, path):
+    def __init__(self, user, path=None):
         if path:
-            self.path = os.getcwd()
-        else:
             self.path = path
+        else:
+            self.path = os.getcwd()
 
+        self.user = user
         self.api = auth()
 
         try:
@@ -22,40 +22,26 @@ class DownloadService():
             print('Something went wrong. Check input parameters.')
             exit(1)
 
-        albums_items = albums.get('items')
-
-        self.user = user
-        self.album_count = albums.get('count')
-
         self.albums = []
-        for item in albums_items:
-            d = dict.fromkeys(['id', 'title', 'size'])
-            d.update([('id', item.get('id')),
+        for item in albums.get('items'):
+            dict_buffer = dict.fromkeys(['id', 'title', 'size'])
+            dict_buffer.update([('id', item.get('id')),
                                     ('title', item.get('title')),
                                     ('size', item.get('size'))])
 
-            self.albums.append(d)
+            self.albums.append(dict_buffer)
 
     def download_album(self, album_id):
-        links = self.get_links(album_id)
         self.create_folder(album_id)
+        links = self.get_links(album_id)
         title = self.get_album_title(album_id)
-        linkStorage = links.copy()
+        args = tuple((link, self.path, title) for link in links)
 
-        for link in tqdm(links, desc=title, unit='photo'):
-            try:
-                response = requests.get(link)
-                if response.status_code == 200:
-                    with open(os.path.join(self.path, title,
-                                        link[len(link)-10:]), 'wb') as f:
-
-                        f.write(response.content)
-                linkStorage.remove(link)
-            except (Exception, requests.exceptions.RequestException) as err:
-                print('Something went wrong. ' +
-                'Check connection or download folder and try again')
-                self.create_dump(album_id, linkStorage)
-                exit(1)
+        with Pool(processes=cpu_count()) as pool:
+            for _ in tqdm(pool.imap_unordered(self.download_routine, args),
+                                            total=len(links), ascii=True,
+                                            desc=title, unit='photo'):
+                pass
 
     def get_links(self, album_id):
         title = self.get_album_title(album_id)
@@ -68,13 +54,6 @@ class DownloadService():
             links = self.get_photo_links(album_id)
 
         return links
-
-    def create_dump(self, album_id, data):
-        title = self.get_album_title(album_id)
-        with open(os.path.join(self.path, title,
-                                        'links.bin'), 'wb') as file:
-
-            pickle.dump(data, file)
 
     def get_photo_links(self, album_id):
         try:
@@ -126,6 +105,21 @@ class DownloadService():
     def create_folder(self, album_id):
         title = self.get_album_title(album_id)
         os.makedirs(os.path.join(self.path, title), exist_ok=True)
+
+    @staticmethod
+    def download_routine(data):
+        link = data[0]
+        path = data[1]
+        title = data[2]
+        path_to_file = os.path.join(path, title, link[len(link)-10:])
+
+        if os.path.exists(path_to_file):
+            return
+
+        response = requests.get(link)
+        if response.status_code == 200:
+            with open(path_to_file, 'wb') as f:
+                f.write(response.content)
 
 
 if __name__ == '__main__':

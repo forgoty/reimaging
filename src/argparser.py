@@ -2,7 +2,7 @@ import sys
 import argparse
 
 
-version = '0.0.1'
+version = 'v0.0.2'
 
 def createParser():
     parser = argparse.ArgumentParser(
@@ -30,9 +30,7 @@ def create_download_parser(subparsers):
                     description=
                     '''Takes an user ID for download all user
                     albums. By default download all open albums
-                    at working directory. After connection lost or
-                    folder problems, downloading proccess will resume
-                    after second command call''')
+                    at working directory.''')
 
     download_group = download_parser.add_argument_group(title='Params')
     download_group.add_argument('-u', '--user', type=int, required=True,
