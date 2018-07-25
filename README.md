@@ -20,14 +20,13 @@ First number - user ID (1).
 Second number - album ID (136592355)
 ### Launch Examples
 ```sh
-$ python main.py download -u 53083705 -p ~/download-folder --album_id 255217256 
-#download single album of user by ID`s
+$ python main.py download -u 53083705 -p ~/download-folder --album_id 255217256 #download single album of user by ID`s
 $ python main.py download -u 1 #download all albums of user
 ```
 
 ### Todos
 
- - Fix some bugs
+ - More testing
  - Add upload mode
  - Add installation script
  - Test on Windows machine

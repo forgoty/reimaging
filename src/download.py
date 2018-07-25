@@ -32,9 +32,9 @@ class DownloadService():
             self.albums.append(dict_buffer)
 
     def download_album(self, album_id):
-        self.create_folder(album_id)
-        links = self.get_links(album_id)
+        links = self.get_photo_links(album_id)
         title = self.get_album_title(album_id)
+        os.makedirs(os.path.join(self.path, title), exist_ok=True)
         args = tuple((link, self.path, title) for link in links)
 
         with Pool(processes=cpu_count()) as pool:
@@ -42,18 +42,6 @@ class DownloadService():
                                             total=len(links), ascii=True,
                                             desc=title, unit='photo'):
                 pass
-
-    def get_links(self, album_id):
-        title = self.get_album_title(album_id)
-
-        if os.path.exists(os.path.join(self.path, title, 'links.bin')):
-            with open(os.path.join(self.path, title, 'links.bin'), 'rb') as f:
-                links = pickle.load(f)
-                os.remove(os.path.join(self.path, title, 'links.bin'))
-        else:
-            links = self.get_photo_links(album_id)
-
-        return links
 
     def get_photo_links(self, album_id):
         try:
@@ -93,19 +81,6 @@ class DownloadService():
             print('Something went wrong. Check input parameters.')
             exit(1)
 
-    def get_album_size(self, album_id):
-            for item in self.albums:
-                if item.get('id') == album_id:
-                    size = item.get('size')
-                    return size
-            else:
-                print('Something went wrong. Check input parameters.')
-                exit(1)
-
-    def create_folder(self, album_id):
-        title = self.get_album_title(album_id)
-        os.makedirs(os.path.join(self.path, title), exist_ok=True)
-
     @staticmethod
     def download_routine(data):
         link = data[0]
@@ -123,6 +98,6 @@ class DownloadService():
 
 
 if __name__ == '__main__':
-    a = DownloadService(user=1)
-    for item in a.albums:
-        a.download_album(item.get('id'))
+    profile = DownloadService(user=1)
+    for item in profile.albums:
+        profile.download_album(item.get('id'))
