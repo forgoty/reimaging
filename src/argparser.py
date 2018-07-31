@@ -28,7 +28,7 @@ def createParser():
 def create_download_parser(subparsers):
     download_parser = subparsers.add_parser('download', add_help = False,
                     description=
-                    '''Takes an user ID for download all user
+                    '''Takes an owner ID for download all owner
                     albums. By default download all open albums
                     at working directory.''')
 
@@ -40,7 +40,7 @@ def create_download_parser(subparsers):
                     help='Changes download folder')
 
     download_group.add_argument('--album_id', type=int,
-                    help='Download only user album by album id')
+                    help='Download only owner album by album id')
 
     download_group.add_argument('--help', '-h', action='help', help='Help')
 

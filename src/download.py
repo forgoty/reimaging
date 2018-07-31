@@ -7,17 +7,17 @@ from multiprocessing import Pool, cpu_count
 
 class DownloadService():
 
-    def __init__(self, user, path=None):
+    def __init__(self, owner, path=None):
         if path:
             self.path = path
         else:
             self.path = os.getcwd()
 
-        self.user = user
+        self.owner = owner
         self.api = auth()
 
         try:
-            albums = self.api.photos.getAlbums(owner_id=user)
+            albums = self.api.photos.getAlbums(owner_id=owner)
         except:
             print('Something went wrong. Check input parameters.')
             exit(1)
@@ -45,7 +45,7 @@ class DownloadService():
 
     def get_photo_links(self, album_id):
         try:
-            response = self.api.photos.get(owner_id=self.user,
+            response = self.api.photos.get(owner_id=self.owner,
                                         album_id=album_id,
                                         photo_sizes=1)
         except:
@@ -98,6 +98,6 @@ class DownloadService():
 
 
 if __name__ == '__main__':
-    profile = DownloadService(user=1)
+    profile = DownloadService(owner=1)
     for item in profile.albums:
         profile.download_album(item.get('id'))
