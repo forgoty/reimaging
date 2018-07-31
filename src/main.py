@@ -14,7 +14,7 @@ def main():
         else:
             service = DownloadService(namespace.user, namespace.path)
             service.download_album(namespace.album_id)
-    if not namespace:
+    if not namespace.command:
         parser.print_help()
 
 
