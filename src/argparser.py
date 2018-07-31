@@ -33,7 +33,7 @@ def create_download_parser(subparsers):
                     at working directory.''')
 
     download_group = download_parser.add_argument_group(title='Params')
-    download_group.add_argument('-u', '--user', type=int, required=True,
+    download_group.add_argument('-o', '--owner', type=int, required=True,
                     help='Takes ID. Required parameter',)
 
     download_group.add_argument('-p', '--path',
