@@ -30,7 +30,8 @@ def create_download_parser(subparsers):
                     description=
                     '''Takes an owner ID for download all owner
                     albums. By default download all open albums
-                    at working directory.''')
+                    at working directory. Type "-" in front of
+                    owner ID to download group photos.''')
 
     download_group = download_parser.add_argument_group(title='Params')
     download_group.add_argument('-o', '--owner', type=int, required=True,
