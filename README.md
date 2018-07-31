@@ -18,7 +18,8 @@ You will need an owner ID and album ID. Album ID is optional.
 ![N|Solid](https://image.ibb.co/fRpaDo/image.png)
 
 First number - owner ID (1).
-Second number - album ID (136592355)
+Second number - album ID (136592355).
+
 If you want to download group photo:
 
 ![N|Solid](https://image.ibb.co/gGoJve/image.png)
@@ -39,6 +40,5 @@ $ python main.py download -o -17566514 # for group albums
  - Add installation script
  - Test on Windows machine
  - Improve README.md
-
 
 
