@@ -1,33 +1,35 @@
 import os
 from tqdm import tqdm
-from auth import auth
 import requests
 from multiprocessing import Pool, cpu_count
+from pyvk.exceptions import APIError
 
 
 class DownloadService():
 
-    def __init__(self, owner, path=None):
+    def __init__(self, api, owner, path=None, system=0):
         if path:
             self.path = path
         else:
             self.path = os.getcwd()
 
         self.owner = owner
-        self.api = auth()
+        self.api = api
 
         try:
-            albums = self.api.photos.getAlbums(owner_id=owner)
-        except:
-            print('Something went wrong. Check input parameters.')
+            albums_response = api.photos.getAlbums(owner_id=owner,
+                                                    need_system=system)
+        except APIError as exc:
+            print('Error %d: %s' % (exc.error_code, exc.error_msg))
             exit(1)
 
         self.albums = []
-        for item in albums.get('items'):
+        for item in albums_response['items']:
+
             dict_buffer = dict.fromkeys(['id', 'title', 'size'])
-            dict_buffer.update([('id', item.get('id')),
-                                    ('title', item.get('title')),
-                                    ('size', item.get('size'))])
+            dict_buffer.update([('id', item['id']),
+                                    ('title', item['title']),
+                                    ('size', item['size'])])
 
             self.albums.append(dict_buffer)
 
@@ -40,42 +42,43 @@ class DownloadService():
         with Pool(processes=cpu_count()) as pool:
             for _ in tqdm(pool.imap_unordered(self.download_routine, args),
                                             total=len(links), ascii=True,
-                                            desc=title, unit='photo'):
+                                            desc=title, unit=' photos'):
                 pass
 
     def get_photo_links(self, album_id):
+
         try:
             response = self.api.photos.get(owner_id=self.owner,
                                         album_id=album_id,
                                         photo_sizes=1)
-        except:
-            print('Something went wrong. Check input parameters.')
+        except APIError as exc:
+            print('Error %d: %s' % (exc.error_code, exc.error_msg))
             exit(1)
 
-        sizes = [item.get('sizes') for item in response.get('items')]
+        sizes = [item['sizes'] for item in response['items']]
         links = []
 
         for i in range(len(sizes)):
             for item in sizes[i]:
-                if item.get('type') == 'w':
-                    links.append(item.get('src'))
+                if item['type'] == 'w':
+                    links.append(item['src'])
                     break
-                elif item.get('type') == 'z':
-                    links.append(item.get('src'))
+                elif item['type'] == 'z':
+                    links.append(item['src'])
                     break
-                elif item.get('type') == 'y':
-                    links.append(item.get('src'))
+                elif item['type'] == 'y':
+                    links.append(item['src'])
                     break
-                elif item.get('type') == 'x':
-                    links.append(item.get('src'))
+                elif item['type'] == 'x':
+                    links.append(item['src'])
                     break
 
         return links
 
     def get_album_title(self, album_id):
         for item in self.albums:
-            if item.get('id') == album_id:
-                title = item.get('title')
+            if item['id']== album_id:
+                title = item['title']
                 return title
         else:
             print('Something went wrong. Check input parameters.')
@@ -98,6 +101,7 @@ class DownloadService():
 
 
 if __name__ == '__main__':
-    profile = DownloadService(owner=1)
+    import auth
+    profile = DownloadService(api=auth.get_user_api(), owner=1, system=1)
     for item in profile.albums:
-        profile.download_album(item.get('id'))
+        profile.download_album(item['id'])
