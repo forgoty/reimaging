@@ -1,0 +1,126 @@
+from os import listdir, getcwd
+from os.path import isfile, join, abspath
+import requests
+from tqdm import tqdm
+import time
+
+
+class UploadService():
+    def __init__(self, api, title=None, path=None, album_id=None):
+
+        self.api = api
+        self.title = title
+
+        if path:
+            self.path = path
+        else:
+            self.path = getcwd()
+
+        if album_id:
+            self.album_id = album_id
+        else:
+            self.album_id = self.create_album()
+
+        self.upload_server = self.get_upload_server()
+
+
+    def create_album(self):
+        try:
+            album = self.api.photos.createAlbum(title=self.title, privacy=3,
+                                                            comment_privacy=3)
+        except APIError as exc:
+            print('Error %d: %s' % (exc.error_code, exc.error_msg))
+            exit(1)
+
+        return album['id']
+
+    def get_upload_server(self):
+        try:
+            response = self.api.photos.getUploadServer(album_id=self.album_id)
+        except APIError as exc:
+            print('Error %d: %s' % (exc.error_code, exc.error_msg))
+            exit(1)
+
+        return response['upload_url']
+
+
+    def upload_photos(self):
+        #"step" is actually number of files to post in one request
+        step = 4
+        extensions = ['JPG', 'PNG', 'GIF', 'BMP']
+        try:
+            file_path = [join(self.path, file) for file in listdir(self.path)
+                                if isfile(join(self.path, file))
+                                if file[-3:].upper() in extensions]
+        except OSError as e:
+            print('Error %d: %s' % (e.error_code, e.error_msg))
+            exit(1)
+
+        if not file_path:
+            print('No images found')
+            exit(1)
+
+        file_path_len = len(file_path)
+        fields = list(self.get_items_gen(self.open_files(file_path), step=step))
+
+        with tqdm(total=file_path_len, ascii=True,
+                                    desc=self.title,
+                                    unit=' photos', leave=False) as bar:
+
+            for field in fields:
+                self.send_request(field)
+                bar.update(step)
+
+            bar.close()
+            self.close_files(fields)
+            print('Successfully uploaded {} photos'.format(file_path_len))
+
+
+    def send_request(self, files):
+        try:
+            request = requests.post(self.upload_server, files=files).json()
+            self.api.photos.save(album_id=self.album_id, **request)
+        except APIError as exc:
+            print('Error %d: %s' % (exc.error_code, exc.error_msg))
+            exit(1)
+
+    @staticmethod
+    def get_items_gen(data, step=1):
+        while data:
+            yield data[:step]
+            del data[:step]
+
+    @staticmethod
+    def open_files(paths):
+        #return file list of POST-request with correct fields
+        files = []
+        k = 1
+
+        for i, path in enumerate(paths):
+            if k == 5:
+                k = 1
+            file = open(path, 'rb')
+            files.append(('file{}'.format(k),
+                            ('photo{}.{}'.format(i, path[-3:]), file)))
+            k += 1
+
+        return files
+
+    @staticmethod
+    def close_files(field):
+        for i in field:
+            for f in i:
+                f[1][1].close()
+
+
+if __name__ == '__main__':
+    from auth import get_user_api
+
+    api = get_user_api()
+    service = UploadService(api=api, title="Hello", path="/home/nikita/Downloads/f/")
+    t0 = time.time()
+    service.upload_photos()
+    t1 = time.time()
+    print('Exectution time = ', t1 - t0)
+
+

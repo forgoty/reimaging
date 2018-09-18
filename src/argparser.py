@@ -2,12 +2,13 @@ import sys
 import argparse
 
 
-version = 'v0.0.3'
+__version__ = '0.0.4'
 
 def createParser():
     parser = argparse.ArgumentParser(
                     prog = 'reimaging',
-                    description = '''Simple photo downloader from vk.com''',
+                    description = '''Simple photo downloader/uploader
+                                                                for vk.com''',
                     add_help = False)
 
     parent_group = parser.add_argument_group(title='Params')
@@ -15,12 +16,13 @@ def createParser():
     parent_group.add_argument('--version',
                     action='version',
                     help = 'reimaging version',
-                    version='%(prog)s {}'.format(version))
+                    version='%(prog)s {}'.format(__version__ ))
 
     subparsers = parser.add_subparsers(dest='command',
                     title='Commands',)
 
     create_download_parser(subparsers)
+    create_upload_parser(subparsers)
 
     return parser
 
@@ -28,7 +30,7 @@ def createParser():
 def create_download_parser(subparsers):
     download_parser = subparsers.add_parser('download', add_help = False,
                     description=
-                    '''Download photos to local drive.''')
+                    '''Download photos to local drive''')
 
     download_group = download_parser.add_argument_group(title='Params')
 
@@ -51,12 +53,33 @@ def create_download_parser(subparsers):
 
     download_group.add_argument('--system', action='store_const', const=True,
                     help='''Download system albums. If album ID is not set,
-                    download all system albums.
+                    download all system albums
                     Album ID for profile photos = -6.
                     Album ID for wall photos = -7.
                     Album ID for saved photos = -15.''')
 
     download_group.add_argument('--help', '-h', action='help', help='Help')
+
+
+def create_upload_parser(subparsers):
+    upload_parser = subparsers.add_parser('upload', add_help = False,
+                    description=
+                    '''Upload photos to VK album''')
+
+    upload_group = upload_parser.add_argument_group(title='Params')
+
+    upload_group.add_argument('-p', '--path', required=True,
+                    help='Choose photo path for upload')
+
+    upload_subgroup = upload_group.add_mutually_exclusive_group()
+
+    upload_subgroup.add_argument('-t', '--title', action='store',
+                    help='Create Album with "title" name')
+
+    upload_subgroup.add_argument('--album_id', action='store',
+                    help='Update album by ID')
+
+    upload_group.add_argument('--help', '-h', action='help', help='Help')
 
 
 if __name__ == '__main__':

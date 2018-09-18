@@ -2,17 +2,26 @@
 reimaging is simple photo downloader for vk.com using CLI.
 ### Requirements
 - Tested only in python 3.7
-- pyvk
+- pyvk (https://github.com/mkuznets/pyvk)
 - tqdm
+
 ```sh
-$ pip install pyvk
+$ pip install git+https://github.com/mkuznets/pyvk.git
 $ pip install tqdm
 ```
+
+### Installation
+Just cd to source folder and type:
+```sh
+$ python setup.py install
+```
+
 ### Using
 First of all, view help:
 ```sh
-$ python main.py --help
-$ python main.py download --help #for download help
+$ reimaging --help
+$ reimaging download --help #for download help
+$ reimaging upload --help #for upload help
 ```
 You will need an owner ID and album ID. Album ID is optional.
 
@@ -36,19 +45,19 @@ Unfortunately, VK API do not allow to download more than 1000 photos.
 
 ### Launch Examples
 ```sh
-$ python main.py download -o 53083705 -p ~/download-folder --album_id 255217256 #download single album of owner by ID`s
-$ python main.py download -o 1 #download all albums
-$ python main.py download -o -17566514 # for group albums
-$ python main.py download -a -o "owner id" #Downloading with login
-$ python main.py download -a -o "owner id" --system #for download all albums including system albums too.
-$ python main.py download -a -o "owner id" --system --album_id -15 # for donwloading saved photos album
+$ reimaging download -o 53083705 -p ~/download-folder --album_id 255217256 #download single album of owner by ID`s
+$ reimaging download -o 1 #download all albums
+$ reimaging download -o -17566514 # for group albums
+$ reimaging download -a -o "owner id" #Downloading with login
+$ reimaging download -a -o "owner id" --system #for download all albums including system albums too.
+$ reimaging download -a -o "owner id" --system --album_id -15 # for downloading saved photos album
+$ reimaging upload -p "path" -t "title" #Upload photos from "path" to Album with "title"
+$ reimaging upload -p "path" --album_id "album_id" # Update Album with "album_id" with photos form "path"
 ```
 
 ### Todos
 
  - More testing
- - Add upload mode
- - Add installation script
- - Test on Windows machine
+ - Make it for Windows
 
 For any problems and bugs please report to Issues.

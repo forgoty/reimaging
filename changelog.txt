@@ -3,13 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com)
 
+## [0.0.4] - 01.09.2018
+### Added
+- Added upload command. As also, view help.
+
 ## [0.0.3] - 13.08.2018
+### Modules differences
+- Migrated from vk-requests to pyvk module.
+
 ### Added
 - Added authorization parameter [-a, --auth]. Now you can login into your account and download non-public
 photos, if you have access to them.
 - Added system parameter [--system]. Now you can download system albums like profile`s photo,
 saved photos and wall photos of owner.
-- Migrated from vk-requests to pyvk module.
 - Added changelog.
 
 ## [0.0.2] - 01.08.2018

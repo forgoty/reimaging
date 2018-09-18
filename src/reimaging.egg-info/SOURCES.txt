@@ -1,0 +1,8 @@
+README.md
+setup.py
+src/reimaging.egg-info/PKG-INFO
+src/reimaging.egg-info/SOURCES.txt
+src/reimaging.egg-info/dependency_links.txt
+src/reimaging.egg-info/entry_points.txt
+src/reimaging.egg-info/requires.txt
+src/reimaging.egg-info/top_level.txt

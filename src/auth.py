@@ -1,4 +1,3 @@
-from getpass import getpass
 from pyvk import ClientAuth, API
 from pyvk.exceptions import APIError
 
@@ -17,11 +16,8 @@ def get_service_api():
 
 
 def get_user_api():
-    user_login = input("Enter your vk.com login: ")
-
     try:
-        auth = ClientAuth(app_id=APP_ID, username=user_login,
-                                        scope=p_photo)
+        auth = ClientAuth(app_id=APP_ID, scope=p_photo)
         auth.auth()
         api = auth.api(version=API_VERSION, lang='en')
     except APIError as exc:
@@ -33,5 +29,5 @@ def get_user_api():
 
 
 if __name__ == '__main__':
-    api = get_service_api()
+    api = get_user_api()
     print(api.users.get(user_ids=1))
