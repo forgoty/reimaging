@@ -54,7 +54,7 @@ class UploadService():
                         leave=False, unit=' photos') as pbar:
 
                 for _ in pool.imap_unordered(self.send_request, fields):
-                    pbar.update(step)
+                    pbar.update(FILES_IN_REQUESTS)
                 pbar.close()
                 print('Successfully uploaded {} photos'.format(file_path_len))
 
