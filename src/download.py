@@ -41,9 +41,9 @@ class DownloadService():
                 pass
 
     def get_photo_links(self, album_id):
-            response = self.api.photos.get(owner_id=self.owner,
-                                            album_id=album_id,
-                                            photo_sizes=1)
+        response = self.api.photos.get(owner_id=self.owner,
+                                        album_id=album_id,
+                                        photo_sizes=1)
 
         sizes = [item['sizes'] for item in response['items']]
         links = []
