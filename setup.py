@@ -9,7 +9,7 @@ URL = 'https://github.com/forgoty/reimaging'
 EMAIL = 'forgoty13@gmail.com'
 AUTHOR = 'Nikita Alkhovik'
 REQUIRES_PYTHON = '>=3.7.0'
-VERSION=src.__version__,
+VERSION = src.__version__
 
 setup(
     name=NAME,
