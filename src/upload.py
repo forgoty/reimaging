@@ -3,7 +3,6 @@ from os.path import isfile, join
 import requests
 from tqdm import tqdm
 from multiprocessing import dummy, cpu_count
-from pyvk.exceptions import APIError
 
 
 class UploadService():

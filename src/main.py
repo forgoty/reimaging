@@ -8,7 +8,6 @@ from .auth import get_user_api, get_service_api
 
 
 def command_line_runner():
-    sys.tracebacklimit = 0
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
 
@@ -58,6 +57,8 @@ def command_line_runner():
 
 
 def main():
+    sys.tracebacklimit = 0
+    
     try:
         command_line_runner()
     except KeyboardInterrupt:

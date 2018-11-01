@@ -93,6 +93,6 @@ class DownloadService():
 
 if __name__ == '__main__':
     import auth
-    profile = DownloadService(api=auth.get_user_api(), owner=5195232)
+    profile = DownloadService(api=auth.get_user_api(), owner=1)
     for item in profile.albums:
         profile.download_album(item['id'])
