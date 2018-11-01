@@ -1,28 +1,22 @@
 from pyvk import ClientAuth, API
-from pyvk.exceptions import APIError
 
 
 SERVICE_TOKEN = '66619e0066619e0066d3e34c266634f6666666' \
                                             '166619e003ea8d033c12d1a3d08e6fd55'
-
 APP_ID = 5597286
 API_VERSION = 5.80
-p_photo = 4
+PHOTO_SCOPE = 4
+
 
 def get_service_api():
-    api = API(token=SERVICE_TOKEN, scope=p_photo, version=API_VERSION)
-
+    api = API(token=SERVICE_TOKEN, scope=PHOTO_SCOPE, version=API_VERSION)
     return api
 
 
 def get_user_api():
-    try:
-        auth = ClientAuth(app_id=APP_ID, scope=p_photo)
-        auth.auth()
-        api = auth.api(version=API_VERSION, lang='en')
-    except APIError as exc:
-        print('Error %d: %s' % (exc.error_code, exc.error_msg))
-        exit(1)
+    auth = ClientAuth(app_id=APP_ID, scope=PHOTO_SCOPE)
+    auth.auth()
+    api = auth.api(version=API_VERSION, lang='en')
 
     print("Authorization successful.")
     return api

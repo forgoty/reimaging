@@ -1,7 +1,7 @@
 # reimaging
 reimaging is simple photo downloader for vk.com using CLI for UNIX.
 ### Requirements
-- Tested only in python 3.7
+- Python 3.7
 - pyvk (https://github.com/mkuznets/pyvk)
 - tqdm
 
@@ -59,6 +59,6 @@ $ reimaging upload -p "path" --album_id "album_id" # Update Album with "album_id
 
  - More testing
  - Make it for Windows
- - Rewrite using Async IO
+ - Rewrite using AsyncIO
 
 For any problems and bugs please report to Issues.

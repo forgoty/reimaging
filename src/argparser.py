@@ -1,8 +1,7 @@
 import sys
 import argparse
+from . import __version__
 
-
-__version__ = '0.0.4'
 
 def createParser():
     parser = argparse.ArgumentParser(
@@ -16,7 +15,7 @@ def createParser():
     parent_group.add_argument('--version',
                     action='version',
                     help = 'reimaging version',
-                    version='%(prog)s {}'.format(__version__ ))
+                    version='%(prog)s {}'.format(__version__))
 
     subparsers = parser.add_subparsers(dest='command',
                     title='Commands',)

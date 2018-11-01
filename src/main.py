@@ -1,11 +1,13 @@
+import sys
+from pyvk.exceptions import APIError
+
 from .argparser import createParser
 from .download import DownloadService
 from .upload import UploadService
 from .auth import get_user_api, get_service_api
-import sys
 
 
-def main():
+def command_line_runner():
     sys.tracebacklimit = 0
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
@@ -53,6 +55,23 @@ def main():
                                         path=namespace.path)
 
             service.upload_photos()
+
+
+def main():
+    try:
+        command_line_runner()
+    except KeyboardInterrupt:
+        print('Keyboard Interrupt')
+        sys.exit(1)
+
+    except APIError as exc:
+        print('Connection Error %d: %s' % (exc.error_code, exc.error_msg))
+        sys.exit(1)
+
+    except OSError as e:
+        print('System Error %d: %s' % (e.error_code, e.error_msg))
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

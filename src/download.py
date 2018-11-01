@@ -2,7 +2,6 @@ import os
 from tqdm import tqdm
 import requests
 from multiprocessing import Pool, cpu_count
-from pyvk.exceptions import APIError
 
 
 class DownloadService():
@@ -16,12 +15,8 @@ class DownloadService():
         self.owner = owner
         self.api = api
 
-        try:
-            albums_response = api.photos.getAlbums(owner_id=owner,
-                                                    need_system=system)
-        except APIError as exc:
-            print('Error %d: %s' % (exc.error_code, exc.error_msg))
-            exit(1)
+        albums_response = api.photos.getAlbums(owner_id=owner,
+                                                need_system=system)
 
         self.albums = []
         for item in albums_response['items']:
@@ -46,14 +41,9 @@ class DownloadService():
                 pass
 
     def get_photo_links(self, album_id):
-
-        try:
             response = self.api.photos.get(owner_id=self.owner,
-                                        album_id=album_id,
-                                        photo_sizes=1)
-        except APIError as exc:
-            print('Error %d: %s' % (exc.error_code, exc.error_msg))
-            exit(1)
+                                            album_id=album_id,
+                                            photo_sizes=1)
 
         sizes = [item['sizes'] for item in response['items']]
         links = []
@@ -77,9 +67,8 @@ class DownloadService():
 
     def get_album_title(self, album_id):
         for item in self.albums:
-            if item['id']== album_id:
-                title = item['title']
-                return title
+            if item['id'] == album_id:
+                return item['title']
         else:
             print('Something went wrong. Check input parameters.')
             exit(1)
