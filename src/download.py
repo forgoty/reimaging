@@ -47,7 +47,6 @@ class DownloadService():
                                         count=1000)
 
         sizes = [item['sizes'] for item in response['items']]
-        print(len(sizes))
         links = []
 
         for i in range(len(sizes)):
