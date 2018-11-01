@@ -43,9 +43,11 @@ class DownloadService():
     def get_photo_links(self, album_id):
         response = self.api.photos.get(owner_id=self.owner,
                                         album_id=album_id,
-                                        photo_sizes=1)
+                                        photo_sizes=1,
+                                        count=1000)
 
         sizes = [item['sizes'] for item in response['items']]
+        print(len(sizes))
         links = []
 
         for i in range(len(sizes)):
@@ -91,6 +93,6 @@ class DownloadService():
 
 if __name__ == '__main__':
     import auth
-    profile = DownloadService(api=auth.get_user_api(), owner=1, system=1)
+    profile = DownloadService(api=auth.get_user_api(), owner=5195232)
     for item in profile.albums:
         profile.download_album(item['id'])
