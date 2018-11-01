@@ -1,5 +1,5 @@
 # reimaging
-reimaging is simple photo downloader for vk.com using CLI for UNIX.
+reimaging is simple photo downloader/uploader for vk.com using CLI for UNIX.
 ### Requirements
 - Python 3.7
 - pyvk (https://github.com/mkuznets/pyvk)
