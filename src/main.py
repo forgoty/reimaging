@@ -66,7 +66,7 @@ def main():
         sys.exit(1)
 
     except OSError as e:
-        print('System Error %d: %s' % (e.error_code, e.error_msg))
+        print(e)
         sys.exit(1)
 
     except AuthError as e:
@@ -79,6 +79,12 @@ def main():
 
     except ReqError as e:
         print('Request Error %d: %s' % (e.error_code, e.error_msg))
+        sys.exit(1)
+
+    except APIError as e:
+        print('API Error %d: %s' % (e.error_code, e.error_msg))
+        if e.error_msg == 'Unknown error occurred':
+            print('Try again later')
         sys.exit(1)
 
 
