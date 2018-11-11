@@ -7,7 +7,6 @@ from multiprocessing import dummy, cpu_count
 
 class UploadService():
     def __init__(self, api, title=None, path=None, album_id=None):
-
         self.api = api
         self.title = title
 
@@ -26,7 +25,7 @@ class UploadService():
 
     def create_album(self):
         album = self.api.photos.createAlbum(title=self.title, privacy=3,
-                                                            comment_privacy=3)
+                                            comment_privacy=3)
         return album['id']
 
     def _get_upload_server(self):
@@ -38,8 +37,8 @@ class UploadService():
         extensions = ['JPG', 'PNG', 'GIF', 'BMP']
 
         file_path = [join(self.path, file) for file in listdir(self.path)
-                            if isfile(join(self.path, file))
-                            if file[-3:].upper() in extensions]
+                        if isfile(join(self.path, file))
+                        if file[-3:].upper() in extensions]
 
         if not file_path:
             print('No images found')
@@ -55,6 +54,7 @@ class UploadService():
 
                 for _ in pool.imap_unordered(self.send_request, fields):
                     pbar.update(FILES_IN_ONE_POST_REQUEST)
+                    
                 pbar.close()
                 print('Successfully uploaded {} photos'.format(file_path_len))
 

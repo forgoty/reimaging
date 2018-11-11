@@ -15,7 +15,6 @@ def command_line_runner():
         parser.print_help()
 
     if namespace.command == 'download':
-
         if namespace.auth:
             api = get_user_api()
         else:
@@ -28,6 +27,7 @@ def command_line_runner():
                                         system=namespace.system)
 
             service.download_album(namespace.album_id)
+
         else:
             service = DownloadService(api=api,
                                         owner=namespace.owner,
@@ -38,7 +38,6 @@ def command_line_runner():
                 service.download_album(item['id'])
 
     if namespace.command == 'upload':
-
         api = get_user_api()
 
         if namespace.album_id and not namespace.title:
@@ -58,19 +57,28 @@ def command_line_runner():
 
 def main():
     sys.tracebacklimit = 0
-    
+
     try:
         command_line_runner()
+
     except KeyboardInterrupt:
         print('Keyboard Interrupt')
         sys.exit(1)
 
-    except APIError as exc:
-        print('Connection Error %d: %s' % (exc.error_code, exc.error_msg))
-        sys.exit(1)
-
     except OSError as e:
         print('System Error %d: %s' % (e.error_code, e.error_msg))
+        sys.exit(1)
+
+    except AuthError as e:
+        print('Authentication Error %d: %s' % (e.error_code, e.error_msg))
+        sys.exit(1)
+
+    except InvalidToken as e:
+        print('Invalid Token Error %d: %s' % (e.error_code, e.error_msg))
+        sys.exit(1)
+
+    except ReqError as e:
+        print('Request Error %d: %s' % (e.error_code, e.error_msg))
         sys.exit(1)
 
 

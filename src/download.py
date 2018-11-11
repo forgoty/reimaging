@@ -5,7 +5,6 @@ from multiprocessing import Pool, cpu_count
 
 
 class DownloadService():
-
     def __init__(self, api, owner, path=None, system=0):
         if path:
             self.path = path
@@ -14,18 +13,15 @@ class DownloadService():
 
         self.owner = owner
         self.api = api
-
         albums_response = api.photos.getAlbums(owner_id=owner,
                                                 need_system=system)
 
         self.albums = []
         for item in albums_response['items']:
-
             dict_buffer = dict.fromkeys(['id', 'title', 'size'])
             dict_buffer.update([('id', item['id']),
                                     ('title', item['title']),
                                     ('size', item['size'])])
-
             self.albums.append(dict_buffer)
 
     def download_album(self, album_id):
@@ -36,15 +32,13 @@ class DownloadService():
 
         with Pool(processes=cpu_count()) as pool:
             for _ in tqdm(pool.imap_unordered(self.download_routine, args),
-                                            total=len(links), ascii=True,
-                                            desc=title, unit=' photos'):
+                            total=len(links), ascii=True, desc=title,
+                            unit=' photos'):
                 pass
 
     def get_photo_links(self, album_id):
-        response = self.api.photos.get(owner_id=self.owner,
-                                        album_id=album_id,
-                                        photo_sizes=1,
-                                        count=1000)
+        response = self.api.photos.get(owner_id=self.owner, album_id=album_id,
+                                        photo_sizes=1, count=1000)
 
         sizes = [item['sizes'] for item in response['items']]
         links = []
@@ -76,9 +70,7 @@ class DownloadService():
 
     @staticmethod
     def download_routine(data):
-        link = data[0]
-        path = data[1]
-        title = data[2]
+        link, path, title = data
         path_to_file = os.path.join(path, title, link[len(link)-10:])
 
         if os.path.exists(path_to_file):
@@ -92,6 +84,6 @@ class DownloadService():
 
 if __name__ == '__main__':
     import auth
-    profile = DownloadService(api=auth.get_user_api(), owner=1)
+    profile = DownloadService(api=auth.get_service_api(), owner=1)
     for item in profile.albums:
         profile.download_album(item['id'])
