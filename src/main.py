@@ -1,5 +1,5 @@
 import sys
-from pyvk.exceptions import APIError
+from pyvk.exceptions import *
 
 from .argparser import createParser
 from .download import DownloadService
