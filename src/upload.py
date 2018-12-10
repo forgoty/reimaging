@@ -10,7 +10,7 @@ class UploadService():
         self.api = api
         self.title = title
 
-        if path:
+        if path is not None:
             self.path = path
         else:
             self.path = getcwd()
@@ -54,7 +54,7 @@ class UploadService():
 
                 for _ in pool.imap_unordered(self.send_request, fields):
                     pbar.update(FILES_IN_ONE_POST_REQUEST)
-                    
+
                 pbar.close()
                 print('Successfully uploaded {} photos'.format(file_path_len))
 

@@ -6,7 +6,7 @@ from multiprocessing import Pool, cpu_count
 
 class DownloadService():
     def __init__(self, api, owner, path=None, system=0):
-        if path:
+        if path is not None:
             self.path = path
         else:
             self.path = os.getcwd()

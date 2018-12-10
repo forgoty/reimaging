@@ -1,1 +1,7 @@
 /venv/
+/virenv/
+/build/
+/dist/
+/reimaging.egg-info/
+/src/__pycache__/
+*.pyc
