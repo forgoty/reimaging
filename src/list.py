@@ -1,4 +1,4 @@
-from download import DownloadService
+from .download import DownloadService
 get_albums = DownloadService.get_albums
 
 
