@@ -11,6 +11,9 @@ AUTHOR = 'Nikita Alkhovik'
 REQUIRES_PYTHON = '>=3.7.0'
 VERSION = src.__version__
 
+with open('requirements.txt', 'r') as file:
+    requirements = file.readlines()
+
 setup(
     name=NAME,
     version=VERSION,
@@ -21,6 +24,7 @@ setup(
     url=URL,
     packages=['src'],
     license='MIT',
+    install_requires=[i.replace('\n', '') for i in requirements],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
