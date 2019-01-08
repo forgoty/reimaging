@@ -3,6 +3,7 @@ from os.path import isfile, join
 import requests
 from tqdm import tqdm
 from multiprocessing import dummy, cpu_count
+import time
 
 
 class UploadService():
@@ -69,6 +70,7 @@ class UploadService():
         try:
             request = requests.post(self.upload_server, files=data).json()
             self.api.photos.save(album_id=self.album_id, **request)
+            time.sleep(.2)
         finally:
             self._close_files(data)
 
