@@ -14,7 +14,7 @@ def createParser():
     parent_group.add_argument('--help', '-h', action='help', help='Help')
     parent_group.add_argument('--version',
                     action='version',
-                    help = 'reimaging version',
+                    help='reimaging version',
                     version='%(prog)s {}'.format(__version__))
 
     subparsers = parser.add_subparsers(dest='command',
@@ -22,6 +22,7 @@ def createParser():
 
     create_download_parser(subparsers)
     create_upload_parser(subparsers)
+    create_list_parser(subparsers)
 
     return parser
 
@@ -38,17 +39,17 @@ def create_download_parser(subparsers):
                     help='''Enable authorization for downloading
                     private albums''')
 
-    download_group.add_argument('-o', '--owner', type=int, required=True,
-                    help='''Takes an owner ID for download all owner
+    download_group.add_argument('-u', '--user', type=int, required=True,
+                    help='''Takes an user ID for download all user
                     albums. By default download all albums
                     at working directory. Type "-" in front of
-                    owner ID to download group photos''')
+                    user ID to download group photos''')
 
     download_group.add_argument('-p', '--path',
                     help='Changes download folder')
 
     download_group.add_argument('--album_id', type=int,
-                    help='Download only owner album by album id')
+                    help='Download only user album by album id')
 
     download_group.add_argument('--system', action='store_const', const=True,
                     help='''Download system albums. If album ID is not set,
@@ -79,6 +80,23 @@ def create_upload_parser(subparsers):
                     help='Update album by ID')
 
     upload_group.add_argument('--help', '-h', action='help', help='Help')
+
+
+def create_list_parser(subparsers):
+    list_parser = subparsers.add_parser('list',
+                                description='Get list of user photo albums')
+
+    list_parser.add_argument('id', type=int,
+                                help='User ID')
+
+    list_group = list_parser.add_argument_group(title='Params')
+    list_group.add_argument('-a', '--auth', action='store_const',
+                            const=True,
+                            help='Enable authorization')
+
+    list_group.add_argument('--system', action='store_const',
+                            const=True,
+                            help='List system albums')
 
 
 if __name__ == '__main__':

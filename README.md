@@ -53,6 +53,7 @@ $ reimaging download -a -o "owner id" --system #for download all albums includin
 $ reimaging download -a -o "owner id" --system --album_id -15 # for downloading saved photos album
 $ reimaging upload -p "path" -t "title" #Upload photos from "path" to Album with "title"
 $ reimaging upload -p "path" --album_id "album_id" # Update Album with "album_id" with photos form "path"
+$ reimaging list -a --system 1 # View album list with system albums
 ```
 
 ### Todos

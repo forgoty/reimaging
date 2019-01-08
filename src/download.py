@@ -5,24 +5,15 @@ from multiprocessing import Pool, cpu_count
 
 
 class DownloadService():
-    def __init__(self, api, owner, path=None, system=0):
+    def __init__(self, api, user, path=None, system=0):
         if path is not None:
             self.path = path
         else:
             self.path = os.getcwd()
 
-        self.owner = owner
+        self.user = user
         self.api = api
-        albums_response = api.photos.getAlbums(owner_id=owner,
-                                                need_system=system)
-
-        self.albums = []
-        for item in albums_response['items']:
-            dict_buffer = dict.fromkeys(['id', 'title', 'size'])
-            dict_buffer.update([('id', item['id']),
-                                    ('title', item['title']),
-                                    ('size', item['size'])])
-            self.albums.append(dict_buffer)
+        self.albums = self.get_albums(api, self.user, system)
 
     def download_album(self, album_id):
         links = self.get_photo_links(album_id)
@@ -37,7 +28,7 @@ class DownloadService():
                 pass
 
     def get_photo_links(self, album_id):
-        response = self.api.photos.get(owner_id=self.owner, album_id=album_id,
+        response = self.api.photos.get(owner_id=self.user, album_id=album_id,
                                         photo_sizes=1, count=1000)
 
         sizes = [item['sizes'] for item in response['items']]
@@ -81,9 +72,24 @@ class DownloadService():
             with open(path_to_file, 'wb') as f:
                 f.write(response.content)
 
+    @staticmethod
+    def get_albums(api, user, system=None):
+        albums_response = api.photos.getAlbums(owner_id=user,
+                                                need_system=system)
+
+        albums = []
+        for item in albums_response['items']:
+            dict_buffer = dict.fromkeys(['id', 'title', 'size'])
+            dict_buffer.update([('id', item['id']),
+                                    ('title', item['title']),
+                                    ('size', item['size'])])
+            albums.append(dict_buffer)
+
+        return albums
+
 
 if __name__ == '__main__':
     import auth
-    profile = DownloadService(api=auth.get_service_api(), owner=1)
+    profile = DownloadService(api=auth.get_service_api(), user=1)
     for item in profile.albums:
         profile.download_album(item['id'])

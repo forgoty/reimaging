@@ -5,6 +5,58 @@ from .argparser import createParser
 from .download import DownloadService
 from .upload import UploadService
 from .auth import get_user_api, get_service_api
+from .list import get_list
+
+
+def download_command(namespace):
+    if namespace.auth:
+        api = get_user_api()
+    else:
+        api = get_service_api()
+
+    if namespace.album_id:
+        service = DownloadService(api=api,
+                                user=namespace.user,
+                                path=namespace.path,
+                                system=namespace.system)
+
+        service.download_album(namespace.album_id)
+
+    else:
+        service = DownloadService(api=api,
+                                user=namespace.user,
+                                path=namespace.path,
+                                system=namespace.system)
+
+        for item in service.albums:
+            service.download_album(item['id'])
+
+
+def upload_command(namespace):
+    api = get_user_api()
+
+    if namespace.album_id and not namespace.title:
+        service = UploadService(api,
+                                album_id=namespace.album_id,
+                                path=namespace.path)
+
+        service.upload_photos()
+
+    if namespace.title and not namespace.album_id:
+        service = UploadService(api,
+                                title=namespace.title,
+                                path=namespace.path)
+
+        service.upload_photos()
+
+
+def list_command(namespace):
+    if namespace.auth:
+        api = get_user_api()
+    else:
+        api = get_service_api()
+
+    get_list(api, namespace.id, namespace.system)
 
 
 def command_line_runner():
@@ -15,44 +67,13 @@ def command_line_runner():
         parser.print_help()
 
     if namespace.command == 'download':
-        if namespace.auth:
-            api = get_user_api()
-        else:
-            api = get_service_api()
-
-        if namespace.album_id:
-            service = DownloadService(api=api,
-                                        owner=namespace.owner,
-                                        path=namespace.path,
-                                        system=namespace.system)
-
-            service.download_album(namespace.album_id)
-
-        else:
-            service = DownloadService(api=api,
-                                        owner=namespace.owner,
-                                        path=namespace.path,
-                                        system=namespace.system)
-
-            for item in service.albums:
-                service.download_album(item['id'])
+        download_command(namespace)
 
     if namespace.command == 'upload':
-        api = get_user_api()
+        upload_command(namespace)
 
-        if namespace.album_id and not namespace.title:
-            service = UploadService(api,
-                                        album_id=namespace.album_id,
-                                        path=namespace.path)
-
-            service.upload_photos()
-
-        if namespace.title and not namespace.album_id:
-            service = UploadService(api,
-                                        title=namespace.title,
-                                        path=namespace.path)
-
-            service.upload_photos()
+    if namespace.command == 'list':
+        list_command(namespace)
 
 
 def main():
