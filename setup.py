@@ -1,3 +1,5 @@
+import os
+
 from setuptools import setup
 import src
 
@@ -8,11 +10,8 @@ DESCRIPTION = 'Simple VK photo downloader/uploader'
 URL = 'https://github.com/forgoty/reimaging'
 EMAIL = 'forgoty13@gmail.com'
 AUTHOR = 'Nikita Alkhovik'
-REQUIRES_PYTHON = '>=3.7.0'
 VERSION = src.__version__
 
-with open('requirements.txt', 'r') as file:
-    requirements = file.readlines()
 
 setup(
     name=NAME,
@@ -20,11 +19,9 @@ setup(
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=EMAIL,
-    python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=['src'],
     license='MIT',
-    install_requires=[i.replace('\n', '') for i in requirements],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

@@ -1,19 +1,14 @@
 # reimaging
 reimaging is simple photo downloader/uploader for vk.com using CLI for UNIX.
 ### Requirements
-- Python 3.7
 - pyvk (https://github.com/mkuznets/pyvk)
 - tqdm
-
-```sh
-$ pip install git+https://github.com/mkuznets/pyvk.git
-$ pip install tqdm
-```
 
 ### Installation
 Just cd to source folder and type:
 ```sh
-$ python setup.py install
+$ pip install git+https://github.com/mkuznets/pyvk
+$ sudo python setup.py install
 ```
 
 ### Using
@@ -22,6 +17,7 @@ First of all, view help:
 $ reimaging --help
 $ reimaging download --help #for download help
 $ reimaging upload --help #for upload help
+$ reimaging list --help #for list help
 ```
 You will need an owner ID and album ID. Album ID is optional.
 
