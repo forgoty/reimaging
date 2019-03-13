@@ -28,8 +28,12 @@ class DownloadService():
                 pass
 
     def get_photo_links(self, album_id):
-        response = self.api.photos.get(owner_id=self.user, album_id=album_id,
-                                        photo_sizes=1, count=1000)
+        response = self.api.photos.get(
+            owner_id=self.user,
+            album_id=album_id,
+            photo_sizes=1,
+            count=1000
+        )
 
         sizes = [item['sizes'] for item in response['items']]
         links = []
@@ -74,15 +78,21 @@ class DownloadService():
 
     @staticmethod
     def get_albums(api, user, system=None):
-        albums_response = api.photos.getAlbums(owner_id=user,
-                                                need_system=system)
+        albums_response = api.photos.getAlbums(
+            owner_id=user,
+            need_system=system
+        )
 
         albums = []
         for item in albums_response['items']:
             dict_buffer = dict.fromkeys(['id', 'title', 'size'])
-            dict_buffer.update([('id', item['id']),
-                                    ('title', item['title']),
-                                    ('size', item['size'])])
+            dict_buffer.update(
+                [
+                    ('id', item['id']),
+                    ('title', item['title']),
+                    ('size', item['size'])
+                ]
+            )
             albums.append(dict_buffer)
 
         return albums

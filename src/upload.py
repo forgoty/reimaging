@@ -1,5 +1,4 @@
-from os import listdir, getcwd
-from os.path import isfile, join
+import os
 import requests
 from tqdm import tqdm
 from multiprocessing import dummy, cpu_count
@@ -14,7 +13,7 @@ class UploadService():
         if path is not None:
             self.path = path
         else:
-            self.path = getcwd()
+            self.path = os.getcwd()
 
         if album_id:
             self.album_id = album_id
@@ -35,11 +34,13 @@ class UploadService():
 
     def upload_photos(self):
         FILES_IN_ONE_POST_REQUEST = 4
-        extensions = ['JPG', 'PNG', 'GIF', 'BMP']
+        extensions = ('jpg', 'png', 'gif', 'bmp')
 
-        file_path = [join(self.path, file) for file in listdir(self.path)
-                        if isfile(join(self.path, file))
-                        if file[-3:].upper() in extensions]
+        file_path = [
+            os.path.join(self.path, file) for file in os.listdir(self.path)
+                if os.path.isfile(os.path.join(self.path, file))
+                if file.endwith(extensions)
+        ]
 
         if not file_path:
             print('No images found')
@@ -64,12 +65,14 @@ class UploadService():
 
         for i, path in enumerate(paths):
             file = open(path, 'rb')
-            data.append(('file{}'.format(i+1),
-                            ('photo{}.{}'.format(i, path[-3:]), file)))
+            data.append(
+                ('file{}'.format(i+1),
+                ('photo{}.{}'.format(i, path[-3:]), file))
+            )
 
         try:
-            request = requests.post(self.upload_server, files=data).json()
-            self.api.photos.save(album_id=self.album_id, **request)
+            request = requests.post(self.upload_server, files=data)
+            self.api.photos.save(album_id=self.album_id, **request.json())
             time.sleep(.2)
         finally:
             self._close_files(data)
@@ -77,7 +80,7 @@ class UploadService():
     @staticmethod
     def _get_items_gen(data, step=1):
         while data:
-            yield list(data[:step])
+            yield tuple(data[:step])
             del data[:step]
 
     @staticmethod

@@ -15,18 +15,22 @@ def download_command(namespace):
         api = get_service_api()
 
     if namespace.album_id:
-        service = DownloadService(api=api,
-                                user=namespace.user,
-                                path=namespace.path,
-                                system=namespace.system)
+        service = DownloadService(
+            api=api,
+            user=namespace.user,
+            path=namespace.path,
+            system=namespace.system
+        )
 
         service.download_album(namespace.album_id)
 
     else:
-        service = DownloadService(api=api,
-                                user=namespace.user,
-                                path=namespace.path,
-                                system=namespace.system)
+        service = DownloadService(
+            api=api,
+            user=namespace.user,
+            path=namespace.path,
+            system=namespace.system
+        )
 
         for item in service.albums:
             service.download_album(item['id'])
@@ -36,17 +40,19 @@ def upload_command(namespace):
     api = get_user_api()
 
     if namespace.album_id and not namespace.title:
-        service = UploadService(api,
-                                album_id=namespace.album_id,
-                                path=namespace.path)
-
+        service = UploadService(
+            api,
+            album_id=namespace.album_id,
+            path=namespace.path
+        )
         service.upload_photos()
 
     if namespace.title and not namespace.album_id:
-        service = UploadService(api,
-                                title=namespace.title,
-                                path=namespace.path)
-
+        service = UploadService(
+            api,
+            title=namespace.title,
+            path=namespace.path
+        )
         service.upload_photos()
 
 
