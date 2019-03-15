@@ -83,7 +83,8 @@ def create_download_parser(subparsers):
 
 def create_upload_parser(subparsers):
     upload_parser = subparsers.add_parser(
-        'upload', add_help = False,
+        'upload',
+        add_help = False,
         description='Upload photos to VK album'
     )
 
