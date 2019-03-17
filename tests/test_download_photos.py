@@ -43,3 +43,17 @@ class DownloadTest(TestCase):
                 self.JPG_FILE_PATH)
         )
 
+    def test_service_album_download(self):
+        album_id = -6
+        testing_file = self.BASE_DIR + '/tests/test_data/fafe4c.jpg'
+        profile = DownloadService(api=auth.get_service_api(), user=1, system=1)
+        album = profile.get_album(album_id)
+        profile.download(album)
+        dirs = os.listdir(self.BASE_DIR)
+
+        self.assertTrue(album.title in dirs, 'Failed dir creattion')
+        self.assertTrue(filecmp.cmp(
+                self.BASE_DIR + '/' + album.title + '/' + 'fafe4c.jpg',
+                testing_file)
+        )
+        rmtree(self.BASE_DIR + '/'+ album.title, ignore_errors=True)

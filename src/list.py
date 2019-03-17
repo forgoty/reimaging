@@ -1,11 +1,7 @@
-from .download import DownloadService
-get_albums = DownloadService.get_albums
+from .download2 import DownloadService
 
 
-def get_list(api, user_id, system=None):
-    albums = get_albums(api, user_id, system)
-    for album in albums:
-        id = album.get('id')
-        title = album.get('title')
-        size = album.get('size')
-        print('id:{} - {}({})'.format(id, title, size))
+def get_list(api, user, system=None):
+    service = DownloadService(api, user, system=system)
+    for album in service.albums:
+        print('id:{} - {}({})'.format(album.id, album.title, album.size))
