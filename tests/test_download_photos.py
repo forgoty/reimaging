@@ -3,7 +3,7 @@ from shutil import rmtree
 import filecmp
 from unittest import TestCase
 
-from src.download2 import DownloadService
+from src.download import DownloadService
 from src import auth
 
 
@@ -22,7 +22,7 @@ class DownloadTest(TestCase):
     def test_album_download_with_service_api(self):
         profile = DownloadService(api=auth.get_service_api(), user=1)
         album = profile.get_album(self.ALBUM_ID)
-        profile.download(album)
+        profile.download_album(album)
         dirs = os.listdir(self.BASE_DIR)
 
         self.assertTrue(self.ALBUM_TITLE in dirs, 'Failed dir creattion')
@@ -34,7 +34,7 @@ class DownloadTest(TestCase):
     def test_album_download_with_user_api(self):
         profile = DownloadService(api=auth.get_user_api(), user=1)
         album = profile.get_album(self.ALBUM_ID)
-        profile.download(album)
+        profile.download_album(album)
         dirs = os.listdir(self.BASE_DIR)
 
         self.assertTrue(self.ALBUM_TITLE in dirs, 'Failed dir creattion')
@@ -48,7 +48,7 @@ class DownloadTest(TestCase):
         testing_file = self.BASE_DIR + '/tests/test_data/fafe4c.jpg'
         profile = DownloadService(api=auth.get_service_api(), user=1, system=1)
         album = profile.get_album(album_id)
-        profile.download(album)
+        profile.download_album(album)
         dirs = os.listdir(self.BASE_DIR)
 
         self.assertTrue(album.title in dirs, 'Failed dir creattion')

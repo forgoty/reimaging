@@ -1,4 +1,4 @@
-from .download2 import DownloadService
+from .download import DownloadService
 
 
 def get_list(api, user, system=None):

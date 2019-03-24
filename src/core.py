@@ -4,10 +4,8 @@ import os
 class Album():
     def __init__(self, api, **kwargs):
         self.api = api
-        self.id = kwargs['id']
-        self.title = kwargs['title']
-        self.size = kwargs['size']
-        self.owner_id = kwargs['owner_id']
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __str__(self):
         return 'Album({}) of {} id'.format(self.id, self.owner_id)

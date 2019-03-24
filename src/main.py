@@ -2,7 +2,7 @@ import sys
 from pyvk.exceptions import *
 
 from .argparser import createParser
-from .download2 import DownloadService
+from .download import DownloadService
 from .upload import UploadService
 from .auth import get_user_api, get_service_api
 from .list import get_list
@@ -33,7 +33,7 @@ def download_command(namespace):
         )
 
         for item in service.albums:
-            service.download(item)
+            service.download_album(item)
 
 
 def upload_command(namespace):
