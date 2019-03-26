@@ -5,6 +5,12 @@ from multiprocessing import dummy, cpu_count
 import time
 
 
+from .core import Album, Photo
+
+
+FILES_IN_ONE_POST_REQUEST = 4
+EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
+
 class UploadService():
     def __init__(self, api, title=None, path=None, album_id=None):
         self.api = api
@@ -16,9 +22,9 @@ class UploadService():
             self.path = os.getcwd()
 
         if album_id:
-            self.album_id = album_id
+            self.album = get_album_by_id(album_id)
         else:
-            self.album_id = self.create_album()
+            self.album = self.create_album()
 
         self.upload_server = self._get_upload_server()
 
@@ -26,20 +32,26 @@ class UploadService():
     def create_album(self):
         album = self.api.photos.createAlbum(title=self.title, privacy=3,
                                             comment_privacy=3)
-        return album['id']
+        return Album(self.api, **album)
+
+    def get_album_by_id(self, id):
+        response = self.api.photos.getAlbums(
+            owner_id=self.user,
+            albums_ids=[id],
+            need_system=self.system
+        )
+        return Album(self.api, **response['items'][0])
 
     def _get_upload_server(self):
-        response = self.api.photos.getUploadServer(album_id=self.album_id)
+        response = self.api.photos.getUploadServer(album_id=self.album.id)
         return response['upload_url']
 
     def upload_photos(self):
-        FILES_IN_ONE_POST_REQUEST = 4
-        extensions = ('jpg', 'png', 'gif', 'bmp')
 
         file_path = [
             os.path.join(self.path, file) for file in os.listdir(self.path)
                 if os.path.isfile(os.path.join(self.path, file))
-                if file.endwith(extensions)
+                if file.endswith(EXTENSIONS)
         ]
 
         if not file_path:
@@ -50,10 +62,11 @@ class UploadService():
         fields = list(self._get_items_gen(file_path,
                                             step=FILES_IN_ONE_POST_REQUEST))
 
-        with dummy.Pool(processes=cpu_count()) as pool:
-            with tqdm(total=file_path_len, ascii=True, desc=self.title,
-                        leave=False, unit=' photos') as pbar:
+        pbar = tqdm(total=file_path_len, ascii=True, desc=self.title,
+                                                leave=False, unit=' photos')
 
+        with dummy.Pool(processes=cpu_count()) as pool:
+            with pbar:
                 for _ in pool.imap_unordered(self.send_request, fields):
                     pbar.update(FILES_IN_ONE_POST_REQUEST)
 
@@ -72,7 +85,7 @@ class UploadService():
 
         try:
             request = requests.post(self.upload_server, files=data)
-            self.api.photos.save(album_id=self.album_id, **request.json())
+            self.api.photos.save(album_id=self.album.id, **request.json())
             time.sleep(.2)
         finally:
             self._close_files(data)
