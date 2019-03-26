@@ -26,15 +26,13 @@ class DownloadService():
 
         return [Album(self.api,**item) for item in response['items']]
 
-    def get_album(self, id):
-        for album in self.albums:
-            if album.id == id:
-                return album
+    def get_album_by_id(self, id):
+        return next((album for album in self.albums if album.id == id), None)
 
     def download_album(self, album):
         os.makedirs(os.path.join(self.path, album.title), exist_ok=True)
         args = tuple(
-            (link, self.path, album.title) for link in album.get_photo_links()
+            (photo.url, self.path, album.title) for photo in album.photos
         )
 
         with Pool(processes=cpu_count()) as pool:
@@ -50,14 +48,14 @@ class DownloadService():
 
     @staticmethod
     def _download_routine(data):
-        link, path, title = data
-        path_to_file = os.path.join(path, title, link[len(link)-10:])
+        url, path, title = data
+        path_to_file = os.path.join(path, title, url[len(url)-10:])
 
         if os.path.exists(path_to_file):
             print('{} already exists'.format(path_to_file))
             return
 
-        response = requests.get(link)
+        response = requests.get(url)
         if response.status_code == 200:
             with open(path_to_file, 'wb') as f:
                 f.write(response.content)
