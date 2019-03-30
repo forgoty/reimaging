@@ -4,12 +4,12 @@ from tqdm import tqdm
 from multiprocessing import dummy, cpu_count
 import time
 
-
-from .core import Album, Photo
+from .core import Album
 
 
 FILES_IN_ONE_POST_REQUEST = 4
 EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
+
 
 class UploadService():
     def __init__(self, api, title=None, path=None, album_id=None):
@@ -22,12 +22,11 @@ class UploadService():
             self.path = os.getcwd()
 
         if album_id:
-            self.album = get_album_by_id(album_id)
+            self.album = self.get_album_by_id(album_id)
         else:
             self.album = self.create_album()
 
         self.upload_server = self._get_upload_server()
-
 
     def create_album(self):
         album = self.api.photos.createAlbum(title=self.title, privacy=3,
@@ -36,9 +35,7 @@ class UploadService():
 
     def get_album_by_id(self, id):
         response = self.api.photos.getAlbums(
-            owner_id=self.user,
             albums_ids=[id],
-            need_system=self.system
         )
         return Album(self.api, **response['items'][0])
 
@@ -50,8 +47,8 @@ class UploadService():
 
         file_path = [
             os.path.join(self.path, file) for file in os.listdir(self.path)
-                if os.path.isfile(os.path.join(self.path, file))
-                if file.endswith(EXTENSIONS)
+                            if os.path.isfile(os.path.join(self.path, file))
+                            if file.endswith(EXTENSIONS)
         ]
 
         if not file_path:
@@ -60,10 +57,10 @@ class UploadService():
 
         file_path_len = len(file_path)
         fields = list(self._get_items_gen(file_path,
-                                            step=FILES_IN_ONE_POST_REQUEST))
+                                          step=FILES_IN_ONE_POST_REQUEST))
 
         pbar = tqdm(total=file_path_len, ascii=True, desc=self.title,
-                                                leave=False, unit=' photos')
+                    leave=False, unit=' photos')
 
         with dummy.Pool(processes=cpu_count()) as pool:
             with pbar:

@@ -107,6 +107,8 @@ def main():
 
     except ReqError as e:
         print('Request Error %d: %s' % (e.error_code, e.error_msg))
+        print('Seems VK is denying all our requests')
+        print('Just Try again later')
         sys.exit(1)
 
     except APIError as e:
