@@ -22,7 +22,8 @@ def download_command(namespace):
             system=namespace.system
         )
 
-        service.download_album(namespace.album_id)
+        album = service.get_album_by_id(namespace.album_id)
+        service.download_album(album)
 
     else:
         service = DownloadService(

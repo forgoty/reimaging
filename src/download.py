@@ -24,13 +24,14 @@ class DownloadService():
             need_system=self.system
         )
 
-        return [Album(self.api,**item) for item in response['items']]
+        return [Album(self.api, **item) for item in response['items']]
 
     def get_album_by_id(self, id):
         return next((album for album in self.albums if album.id == id), None)
 
     def download_album(self, album):
         os.makedirs(os.path.join(self.path, album.title), exist_ok=True)
+        album.get_photos()
         args = tuple(
             (photo.url, self.path, album.title) for photo in album.photos
         )

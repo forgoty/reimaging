@@ -1,12 +1,8 @@
-import os
-
-
 class Album():
     def __init__(self, api, **kwargs):
         self.api = api
         for key, value in kwargs.items():
             setattr(self, key, value)
-        self.photos = self._get_photos()
 
     def __repr__(self):
         return 'Album {}_{}'.format(self.owner_id, self.id)
@@ -15,7 +11,7 @@ class Album():
     def link(self):
         return 'https://vk.com/{}_{}'.format(self.owner_id, self.id)
 
-    def _get_photos(self):
+    def get_photos(self):
         response = self.api.photos.get(
             owner_id=self.owner_id,
             album_id=self.id,
@@ -23,14 +19,14 @@ class Album():
             count=1000
         )
 
-        return [Photo(**item) for item in response['items']]
+        self.photos = [Photo(**item) for item in response['items']]
+        return self.photos
 
 
 class Photo():
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
-
 
     def __repr__(self):
         return 'Photo {}_{}'.format(self.owner_id, self.id)

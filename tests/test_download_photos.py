@@ -17,7 +17,7 @@ class DownloadTest(TestCase):
         pass
 
     def tearDown(self):
-        rmtree(self.BASE_DIR + '/'+ self.ALBUM_TITLE, ignore_errors=True)
+        rmtree(self.BASE_DIR + '/' + self.ALBUM_TITLE, ignore_errors=True)
 
     def test_album_download_with_service_api(self):
         profile = DownloadService(api=auth.get_service_api(), user=1)
@@ -55,4 +55,4 @@ class DownloadTest(TestCase):
                 self.BASE_DIR + '/' + album.title + '/' + 'aef149.jpg',
                 self.JPG_FILE_PATH)
         )
-        rmtree(self.BASE_DIR + '/'+ album.title, ignore_errors=True)
+        rmtree(self.BASE_DIR + '/' + album.title, ignore_errors=True)
