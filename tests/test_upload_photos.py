@@ -2,8 +2,8 @@ import os
 from shutil import rmtree
 from unittest import TestCase
 
-from src.download import DownloadService
-from src.upload import UploadService
+from src.download import DownloadSession
+from src.upload import UploadSession
 from src import auth
 
 
@@ -27,7 +27,7 @@ class UploadTest(TestCase):
     def test_upload_photos_to_new_album(self):
         self._download_album(TEST_ALBUM_ID_TO_DOWNLOAD,
                              path=PATH_TO_TEST_ALBUM)
-        upload = UploadService(api=self.api,
+        upload = UploadSession(api=self.api,
                                path=PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
                                title=TITLE, album_id=None)
         upload.upload_photos()
@@ -43,11 +43,11 @@ class UploadTest(TestCase):
     def test_upload_to_existing_album(self):
         self._download_album(TEST_ALBUM_ID_TO_DOWNLOAD,
                              path=PATH_TO_TEST_ALBUM)
-        upload = UploadService(api=self.api,
+        upload = UploadSession(api=self.api,
                                path=PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
                                title=TITLE, album_id=None)
         upload.upload_photos()
-        upload = UploadService(api=self.api,
+        upload = UploadSession(api=self.api,
                                path=PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
                                album_id=upload.album.id)
         upload.upload_photos()
@@ -65,7 +65,7 @@ class UploadTest(TestCase):
     # private methods
 
     def _download_album(self, album_id, path=None, user=1):
-        download = DownloadService(api=self.api, user=user,
+        download = DownloadSession(api=self.api, user=user,
                                    path=path)
         album = download.get_album_by_id(album_id)
         download.download_album(album)

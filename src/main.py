@@ -2,8 +2,8 @@ import sys
 from pyvk.exceptions import *
 
 from .argparser import createParser
-from .download import DownloadService
-from .upload import UploadService
+from .download import DownloadSession
+from .upload import UploadSession
 from .auth import get_user_api, get_service_api
 from .list import get_list
 
@@ -15,46 +15,46 @@ def download_command(namespace):
         api = get_service_api()
 
     if namespace.album_id:
-        service = DownloadService(
+        session = DownloadSession(
             api=api,
             user=namespace.user,
             path=namespace.path,
             system=namespace.system
         )
 
-        album = service.get_album_by_id(namespace.album_id)
-        service.download_album(album)
+        album = session.get_album_by_id(namespace.album_id)
+        session.download_album(album)
 
     else:
-        service = DownloadService(
+        session = DownloadSession(
             api=api,
             user=namespace.user,
             path=namespace.path,
             system=namespace.system
         )
 
-        for item in service.albums:
-            service.download_album(item)
+        for item in session.albums:
+            session.download_album(item)
 
 
 def upload_command(namespace):
     api = get_user_api()
 
     if namespace.album_id and not namespace.title:
-        service = UploadService(
+        session = UploadSession(
             api,
             album_id=namespace.album_id,
             path=namespace.path
         )
-        service.upload_photos()
+        session.upload_photos()
 
     if namespace.title and not namespace.album_id:
-        service = UploadService(
+        session = UploadSession(
             api,
             title=namespace.title,
             path=namespace.path
         )
-        service.upload_photos()
+        session.upload_photos()
 
 
 def list_command(namespace):

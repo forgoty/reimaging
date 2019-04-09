@@ -6,13 +6,9 @@ from multiprocessing import Pool, cpu_count
 from .core import Album
 
 
-class DownloadService():
+class DownloadSession():
     def __init__(self, api, user, path=None, system=0):
-        if path is not None:
-            self.path = path
-        else:
-            self.path = os.getcwd()
-
+        self.path = path if path is not None else os.getcwd()
         self.user = user
         self.system = system
         self.api = api
@@ -31,14 +27,17 @@ class DownloadService():
 
     def download_album(self, album):
         os.makedirs(os.path.join(self.path, album.title), exist_ok=True)
-        album.get_photos()
-        args = tuple(
-            (photo.url, self.path, album.title) for photo in album.photos
+        path_to_album = os.path.join(self.path, album.title)
+        path_url_pairs = tuple(
+            (
+                os.path.join(path_to_album, photo.url[len(photo.url)-10:]),
+                photo.url
+            ) for photo in album.get_photos()
         )
 
         with Pool(processes=cpu_count()) as pool:
             progressbar = tqdm(
-                pool.imap_unordered(self._download_routine, args),
+                pool.imap_unordered(self._download_routine, path_url_pairs),
                 total=album.size,
                 ascii=True,
                 desc=album.title,
@@ -48,15 +47,14 @@ class DownloadService():
                 pass
 
     @staticmethod
-    def _download_routine(data):
-        url, path, title = data
-        path_to_file = os.path.join(path, title, url[len(url)-10:])
+    def _download_routine(path_url_pairs):
+        path, url = path_url_pairs
 
-        if os.path.exists(path_to_file):
-            print('{} already exists'.format(path_to_file))
+        if os.path.exists(path):
+            print('{} already exists'.format(path))
             return
 
         response = requests.get(url)
         if response.status_code == 200:
-            with open(path_to_file, 'wb') as f:
-                f.write(response.content)
+            with open(path, 'wb') as file:
+                file.write(response.content)
