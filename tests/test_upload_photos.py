@@ -32,7 +32,7 @@ class UploadTest(TestCase):
                                title=TITLE, album_id=None)
         upload.upload_photos()
         self._download_album(upload.album.id, user=self.user_id,
-                             path=BASE_DIR + TITLE)
+                             path=BASE_DIR)
 
         self.assertEqual(
             self._get_dir_size(BASE_DIR + TITLE),
@@ -54,9 +54,8 @@ class UploadTest(TestCase):
         self._download_album(upload.album.id, user=self.user_id,
                              path=BASE_DIR)
 
-        import ipdb; ipdb.set_trace()
         self.assertEqual(
-            self._get_dir_size(BASE_DIR + TITLE) / 2,
+            self._get_dir_size(BASE_DIR + TITLE) // 2,
             self._get_dir_size(PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE)
         )
         self.api.photos.deleteAlbum(album_id=upload.album.id)
