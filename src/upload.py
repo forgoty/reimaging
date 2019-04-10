@@ -24,16 +24,20 @@ class UploadSession():
 
         self.upload_server = self._get_upload_server()
 
-    def create_album(self):
-        album = self.api.photos.createAlbum(title=self.title, privacy=3,
-                                            comment_privacy=3)
-        return Album(self.api, **album)
-
     def get_album_by_id(self, id):
         response = self.api.photos.getAlbums(
             albums_ids=[id],
         )
         return Album(self.api, **response['items'][0])
+
+    def create_album(self):
+        album = self.api.photos.createAlbum(title=self.title, privacy=3,
+                                            comment_privacy=3)
+        return Album(self.api, **album)
+
+    def _get_upload_server(self):
+        response = self.api.photos.getUploadServer(album_id=self.album.id)
+        return response['upload_url']
 
     def upload_photos(self):
         file_paths = self._get_file_paths()
@@ -52,10 +56,6 @@ class UploadSession():
 
                 pbar.close()
                 print('Successfully uploaded {} photos'.format(files_count))
-
-    def _get_upload_server(self):
-        response = self.api.photos.getUploadServer(album_id=self.album.id)
-        return response['upload_url']
 
     def _get_file_paths(self):
         file_paths = [
