@@ -7,9 +7,10 @@ from .core import Album
 
 
 class DownloadSession():
-    def __init__(self, api, user, path=None, system=0):
-        self.path = path if path is not None else os.getcwd()
+    def __init__(self, api, user, path=None, jobs=None, system=0):
+        self.path = path or os.getcwd()
         self.user = user
+        self.jobs = jobs or cpu_count()
         self.system = system
         self.api = api
         self.albums = self.get_all_albums()
@@ -35,7 +36,7 @@ class DownloadSession():
             ) for photo in album.get_photos()
         )
 
-        with Pool(processes=cpu_count()) as pool:
+        with Pool(processes=self.jobs) as pool:
             progressbar = tqdm(
                 pool.imap_unordered(self._download_routine, path_url_pairs),
                 total=album.size,

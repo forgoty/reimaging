@@ -12,10 +12,11 @@ EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
 
 
 class UploadSession():
-    def __init__(self, api, title=None, path=None, album_id=None):
+    def __init__(self, api, title=None, path=None, jobs=None, album_id=None):
         self.api = api
         self.title = title
-        self.path = path if path is not None else os.getcwd()
+        self.jobs = jobs or cpu_count()
+        self.path = path or os.getcwd()
 
         if album_id:
             self.album = self.get_album_by_id(album_id)
@@ -49,7 +50,7 @@ class UploadSession():
         pbar = tqdm(total=files_count, ascii=True, desc=self.title,
                     leave=False, unit=' photos')
 
-        with dummy.Pool(processes=cpu_count()) as pool:
+        with dummy.Pool(processes=self.jobs) as pool:
             with pbar:
                 for _ in pool.imap_unordered(self._send_request, path_groups):
                     pbar.update(FILES_IN_ONE_POST_REQUEST)

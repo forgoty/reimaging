@@ -19,6 +19,7 @@ def download_command(namespace):
             api=api,
             user=namespace.user,
             path=namespace.path,
+            jobs=namespace.jobs,
             system=namespace.system
         )
 
@@ -30,6 +31,7 @@ def download_command(namespace):
             api=api,
             user=namespace.user,
             path=namespace.path,
+            jobs=namespace.jobs,
             system=namespace.system
         )
 
@@ -44,6 +46,7 @@ def upload_command(namespace):
         session = UploadSession(
             api,
             album_id=namespace.album_id,
+            jobs=namespace.jobs,
             path=namespace.path
         )
         session.upload_photos()
@@ -52,6 +55,7 @@ def upload_command(namespace):
         session = UploadSession(
             api,
             title=namespace.title,
+            jobs=namespace.jobs,
             path=namespace.path
         )
         session.upload_photos()
