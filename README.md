@@ -44,7 +44,7 @@ Unfortunately, VK API do not allow to download more than 1000 photos.
 $ reimaging download -u 53083705 -p ~/download-folder --album_id 255217256 #download single album of owner by ID`s
 $ reimaging download -u 1 #download all albums
 $ reimaging download -u -17566514 # for group albums
-$ reimaging download -a -u <owner id> #Downloading with login
+$ reimaging download -a -u <owner id> -w 8 #Downloading with login and 8 workers
 $ reimaging download -a -u <owner id> --system #for download all albums including system albums too.
 $ reimaging download -a -u <owner id> --system --album_id -15 # for downloading saved photos album
 $ reimaging upload -p <path> -t <title> #Upload photos from "path" to Album with "title"

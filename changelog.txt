@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com)
 
+## [0.0.7] - 17.04.2019
+### Some Refactoring of code
+### Added
+- Now download/upload commands has -w/--workers unnecessory option, which can
+be used for increasing/decreasing number of working processes. This number
+cannot be more than CPU_COUNT*2+1. It may cause Request Errors in some cases.
+
 ## [0.0.6] - 09.01.2019
 ### Added
 - List command. At now you can view List of user photo albums with "list" command
