@@ -136,7 +136,7 @@ def create_list_parser(subparsers):
     )
 
     list_parser.add_argument(
-        'id',
+        'user',
         type=int,
         help='User ID'
     )
