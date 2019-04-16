@@ -1,18 +1,16 @@
 import os
 from tqdm import tqdm
 import requests
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool
 
-from .core import Album
+from .core import BaseSession, Album
 
 
-class DownloadSession():
-    def __init__(self, api, user, path=None, jobs=None, system=0):
-        self.path = path or os.getcwd()
-        self.user = user
-        self.jobs = jobs or cpu_count()
-        self.system = system
-        self.api = api
+class DownloadSession(BaseSession):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.user = kwargs.get('user')
+        self.system = kwargs.get('system', False)
         self.albums = self.get_all_albums()
 
     def get_all_albums(self):
@@ -36,7 +34,7 @@ class DownloadSession():
             ) for photo in album.get_photos()
         )
 
-        with Pool(processes=self.jobs) as pool:
+        with Pool(processes=self.workers) as pool:
             progressbar = tqdm(
                 pool.imap_unordered(self._download_routine, path_url_pairs),
                 total=album.size,

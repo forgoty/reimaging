@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from src.download import DownloadSession
 from src.upload import UploadSession
+from src.core import CPU_COUNT
 from src import auth
 
 
@@ -27,9 +28,7 @@ class UploadTest(TestCase):
     def test_upload_photos_to_new_album(self):
         self._download_album(TEST_ALBUM_ID_TO_DOWNLOAD,
                              path=PATH_TO_TEST_ALBUM)
-        upload = UploadSession(api=self.api,
-                               path=PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
-                               title=TITLE, album_id=None)
+        upload = UploadSession(**self._get_kwargs())
         upload.upload_photos()
         self._download_album(upload.album.id, user=self.user_id,
                              path=BASE_DIR)
@@ -43,9 +42,7 @@ class UploadTest(TestCase):
     def test_upload_to_existing_album(self):
         self._download_album(TEST_ALBUM_ID_TO_DOWNLOAD,
                              path=PATH_TO_TEST_ALBUM)
-        upload = UploadSession(api=self.api,
-                               path=PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
-                               title=TITLE, album_id=None)
+        upload = UploadSession(**self._get_kwargs())
         upload.upload_photos()
         upload = UploadSession(api=self.api,
                                path=PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
@@ -60,14 +57,34 @@ class UploadTest(TestCase):
         )
         self.api.photos.deleteAlbum(album_id=upload.album.id)
 
+    def test_current_workers_when_no_workers_is_provided(self):
+        workers_amount = CPU_COUNT
+        session = UploadSession(**self._get_kwargs())
+        self.assertEqual(session.workers, workers_amount)
+
+    def test_current_workers_when_unvalid_workers_is_provided(self):
+        workers_amount = CPU_COUNT * 20
+        session = UploadSession(**self._get_kwargs())
+        self.assertNotEqual(session.workers, workers_amount)
 
     # private methods
-
     def _download_album(self, album_id, path=None, user=1):
-        download = DownloadSession(api=self.api, user=user,
-                                   path=path)
+        d = {
+            'api': self.api,
+            'user': user,
+            'path': path
+        }
+        download = DownloadSession(**d)
         album = download.get_album_by_id(album_id)
         download.download_album(album)
+
+    def _get_kwargs(self):
+        return {
+            'api': self.api,
+            'path': PATH_TO_TEST_ALBUM + TEST_ALBUM_TITLE,
+            'title': TITLE,
+            'album_id': None,
+        }
 
     @staticmethod
     def _get_dir_size(path):

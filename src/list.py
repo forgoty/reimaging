@@ -1,7 +1,7 @@
 from .download import DownloadSession
 
 
-def get_list(api, user, system=None):
-    session = DownloadSession(api, user, system=system)
+def get_list(**kwargs):
+    session = DownloadSession(**kwargs)
     for album in session.get_all_albums():
-        print('id:{} - {}({})'.format(album.id, album.title, album.size))
+        print('{}({}) - id:{}'.format(album.title, album.size, album.id))

@@ -68,8 +68,8 @@ def create_download_parser(subparsers):
     )
 
     download_group.add_argument(
-        '-j',
-        '--jobs',
+        '-w',
+        '--workers',
         type=int,
         help='Number of workers'
     )
@@ -105,8 +105,8 @@ def create_upload_parser(subparsers):
     )
 
     upload_group.add_argument(
-        '-j',
-        '--jobs',
+        '-w',
+        '--workers',
         type=int,
         help='Number of workers'
     )
