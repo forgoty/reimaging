@@ -1,24 +1,23 @@
 import os
 import requests
-from tqdm import tqdm
-from multiprocessing import dummy, cpu_count
 import time
+from tqdm import tqdm
+from multiprocessing import dummy
 
-from .core import Album
+from .core import BaseSession, Album
 
 
 FILES_IN_ONE_POST_REQUEST = 4
 EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
 
 
-class UploadSession():
-    def __init__(self, api, title=None, path=None, album_id=None):
-        self.api = api
-        self.title = title
-        self.path = path if path is not None else os.getcwd()
+class UploadSession(BaseSession):
+    def __init__(self, **kwargs):
+        super().__init__( **kwargs)
+        self.title = kwargs.get('title')
 
-        if album_id:
-            self.album = self.get_album_by_id(album_id)
+        if kwargs.get('album_id'):
+            self.album = self.get_album_by_id(kwargs['album_id'])
         else:
             self.album = self.create_album()
 
@@ -49,7 +48,7 @@ class UploadSession():
         pbar = tqdm(total=files_count, ascii=True, desc=self.title,
                     leave=False, unit=' photos')
 
-        with dummy.Pool(processes=cpu_count()) as pool:
+        with dummy.Pool(processes=self.workers) as pool:
             with pbar:
                 for _ in pool.imap_unordered(self._send_request, path_groups):
                     pbar.update(FILES_IN_ONE_POST_REQUEST)

@@ -68,6 +68,13 @@ def create_download_parser(subparsers):
     )
 
     download_group.add_argument(
+        '-w',
+        '--workers',
+        type=int,
+        help='Number of workers'
+    )
+
+    download_group.add_argument(
         '--system',
         action='store_const',
         const=True,
@@ -77,6 +84,7 @@ def create_download_parser(subparsers):
                 Album ID for wall photos = -7.
                 Album ID for saved photos = -15.'''
         )
+
 
     download_group.add_argument('--help', '-h', action='help', help='Help')
 
@@ -94,6 +102,13 @@ def create_upload_parser(subparsers):
         '-p',
         '--path',
         help='Choose photo path for upload'
+    )
+
+    upload_group.add_argument(
+        '-w',
+        '--workers',
+        type=int,
+        help='Number of workers'
     )
 
     upload_subgroup = upload_group.add_mutually_exclusive_group()
@@ -121,7 +136,7 @@ def create_list_parser(subparsers):
     )
 
     list_parser.add_argument(
-        'id',
+        'user',
         type=int,
         help='User ID'
     )

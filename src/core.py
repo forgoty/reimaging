@@ -1,3 +1,30 @@
+import os
+from multiprocessing import cpu_count
+
+
+MAX_WORKERS = 2 * cpu_count() + 1
+CPU_COUNT = cpu_count()
+
+
+def get_valid_number_of_workers(workers):
+    if not workers:
+        return CPU_COUNT
+    elif workers <= MAX_WORKERS:
+        return workers
+    elif workers > MAX_WORKERS:
+        print('Too big amount of workers for this.')
+        print('Should be not bigger than {}'.format(MAX_WORKERS))
+        print('Settings workers amount to {}'.format(CPU_COUNT))
+        return CPU_COUNT
+
+
+class BaseSession():
+    def __init__(self, **kwargs):
+        self.path = kwargs.get('path') or os.getcwd()
+        self.workers = get_valid_number_of_workers(kwargs.get('workers'))
+        self.api = kwargs.get('api')
+
+
 class Album():
     def __init__(self, api, **kwargs):
         self.api = api
