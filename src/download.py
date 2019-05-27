@@ -29,7 +29,7 @@ class DownloadSession(BaseSession):
         path_to_album = os.path.join(self.path, album.title)
         path_url_pairs = tuple(
             (
-                os.path.join(path_to_album, photo.url[len(photo.url)-10:]),
+                os.path.join(path_to_album, photo.url.split('/')[-1]),
                 photo.url
             ) for photo in album.get_photos()
         )
@@ -50,7 +50,6 @@ class DownloadSession(BaseSession):
         path, url = path_url_pairs
 
         if os.path.exists(path):
-            print('{} already exists'.format(path))
             return
 
         response = requests.get(url)

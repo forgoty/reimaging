@@ -10,8 +10,9 @@ from src import auth
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ALBUM_ID = 136592355
+FILENAME = 'w_62aef149.jpg'
 ALBUM_TITLE = 'Здесь будут новые фотографии для прессы-службы'
-JPG_FILE_PATH = BASE_DIR + '/tests/test_data/aef149.jpg'
+JPG_FILE_PATH = BASE_DIR + '/tests/test_data/' + FILENAME
 
 
 class DownloadTest(TestCase):
@@ -30,7 +31,7 @@ class DownloadTest(TestCase):
 
         self.assertTrue(ALBUM_TITLE in dirs, 'Failed dir creattion')
         self.assertTrue(filecmp.cmp(
-                BASE_DIR + '/' + album.title + '/' + 'aef149.jpg',
+                BASE_DIR + '/' + album.title + '/' + FILENAME,
                 JPG_FILE_PATH)
         )
 
@@ -42,7 +43,7 @@ class DownloadTest(TestCase):
 
         self.assertTrue(ALBUM_TITLE in dirs, 'Failed dir creattion')
         self.assertTrue(filecmp.cmp(
-                BASE_DIR + '/' + album.title + '/' + 'aef149.jpg',
+                BASE_DIR + '/' + album.title + '/' + FILENAME,
                 JPG_FILE_PATH)
         )
 
@@ -56,7 +57,7 @@ class DownloadTest(TestCase):
 
         self.assertTrue(album.title in dirs, 'Failed dir creattion')
         self.assertTrue(filecmp.cmp(
-                BASE_DIR + '/' + album.title + '/' + 'aef149.jpg',
+                BASE_DIR + '/' + album.title + '/' + FILENAME,
                 JPG_FILE_PATH)
         )
         rmtree(BASE_DIR + '/' + album.title + '/', ignore_errors=True)
