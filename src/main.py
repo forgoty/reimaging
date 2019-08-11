@@ -70,8 +70,8 @@ def download_command(namespace):
         session.download_album(album)
     else:
         session = DownloadSession(api=api, **vars(namespace))
-        for item in session.albums:
-            session.download_album(item)
+        for album in session.albums:
+            session.download_album(album)
 
 
 def upload_command(namespace):

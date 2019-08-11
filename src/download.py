@@ -1,7 +1,8 @@
 import os
 from tqdm import tqdm
-import requests
-from multiprocessing import Pool
+import asyncio
+import aiohttp
+import aiofiles
 
 from .core import BaseSession, Album
 
@@ -34,25 +35,35 @@ class DownloadSession(BaseSession):
             ) for photo in album.get_photos()
         )
 
-        with Pool(processes=self.workers) as pool:
-            progressbar = tqdm(
-                pool.imap_unordered(self._download_routine, path_url_pairs),
-                total=album.size,
-                ascii=True,
-                desc=album.title,
-                unit=' photos'
-            )
-            for _ in progressbar:
-                pass
+        self._download_async(album.title, path_url_pairs)
 
     @staticmethod
-    def _download_routine(path_url_pairs):
-        path, url = path_url_pairs
+    def _download_async(title, path_url_pairs):
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(_download_many(title, path_url_pairs))
+        loop.close()
 
-        if os.path.exists(path):
-            return
 
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(path, 'wb') as file:
-                file.write(response.content)
+async def _download_many(title, path_url_pairs):
+    async with aiohttp.ClientSession() as client:
+        to_do = tuple(
+            _download_one(client, path, url) for path, url in path_url_pairs
+        )
+        to_do_iter = tqdm(
+            asyncio.as_completed(to_do),
+            total=len(path_url_pairs),
+            desc=title,
+            ascii=True,
+            unit=' photos'
+        )
+
+        for coroutine in to_do_iter:
+            await coroutine
+
+
+async def _download_one(client, path, url):
+    async with client.get(url) as response:
+        if response.status == 200:
+            file = await aiofiles.open(path, 'wb')
+            await file.write(await response.read())
+            await file.close()

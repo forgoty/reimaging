@@ -13,7 +13,7 @@ EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
 
 class UploadSession(BaseSession):
     def __init__(self, **kwargs):
-        super().__init__( **kwargs)
+        super().__init__(**kwargs)
         self.title = kwargs.get('title')
 
         if kwargs.get('album_id'):
