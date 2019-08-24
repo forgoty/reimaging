@@ -68,13 +68,6 @@ def create_download_parser(subparsers):
     )
 
     download_group.add_argument(
-        '-w',
-        '--workers',
-        type=int,
-        help='Number of workers'
-    )
-
-    download_group.add_argument(
         '--system',
         action='store_const',
         const=True,
@@ -102,13 +95,6 @@ def create_upload_parser(subparsers):
         '-p',
         '--path',
         help='Choose photo path for upload'
-    )
-
-    upload_group.add_argument(
-        '-w',
-        '--workers',
-        type=int,
-        help='Number of workers'
     )
 
     upload_subgroup = upload_group.add_mutually_exclusive_group()

@@ -4,7 +4,6 @@ import filecmp
 from unittest import TestCase
 
 from src.download import DownloadSession
-from src.core import CPU_COUNT
 from src import auth
 
 
@@ -61,17 +60,3 @@ class DownloadTest(TestCase):
                 JPG_FILE_PATH)
         )
         rmtree(BASE_DIR + '/' + album.title + '/', ignore_errors=True)
-
-    def test_init_session_with_double_workers_count(self):
-        workers_amount = CPU_COUNT * 2
-        args = {'api': auth.get_service_api(), 'user': 1, 'workers': workers_amount}
-        session = DownloadSession(**args)
-        self.assertEqual(session.workers, workers_amount)
-
-    def test_init_session_with_unvalid_count_of_workers(self):
-        workers_amount = CPU_COUNT * 20
-        args = {'api': auth.get_service_api(), 'user': 1, 'workers': workers_amount}
-        session = DownloadSession(**args)
-        self.assertNotEqual(session.workers, workers_amount)
-
-

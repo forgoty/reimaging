@@ -1,5 +1,4 @@
 import os
-from shutil import rmtree
 from unittest import TestCase
 
 from src import auth

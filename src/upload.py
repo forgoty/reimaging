@@ -1,8 +1,8 @@
 import os
-import requests
-import time
+import json
 from tqdm import tqdm
-from multiprocessing import dummy
+import asyncio
+import aiohttp
 
 from .core import BaseSession, Album
 
@@ -45,16 +45,7 @@ class UploadSession(BaseSession):
             self._get_path_group(file_paths, step=FILES_IN_ONE_POST_REQUEST)
         )
 
-        pbar = tqdm(total=files_count, ascii=True, desc=self.title,
-                    leave=False, unit=' photos')
-
-        with dummy.Pool(processes=self.workers) as pool:
-            with pbar:
-                for _ in pool.imap_unordered(self._send_request, path_groups):
-                    pbar.update(FILES_IN_ONE_POST_REQUEST)
-
-                pbar.close()
-                print('Successfully uploaded {} photos'.format(files_count))
+        self._upload_async(files_count, path_groups)
 
     def _get_file_paths(self):
         file_paths = [
@@ -75,30 +66,42 @@ class UploadSession(BaseSession):
             yield tuple(paths[:step])
             del paths[:step]
 
-    def _send_request(self, paths):
-        name_key_pair = self._get_uploading_pair(paths)
-        try:
-            request = requests.post(self.upload_server, files=name_key_pair)
-            self.api.photos.save(album_id=self.album.id, **request.json())
-            time.sleep(0.34)
-        finally:
-            self._close_files(name_key_pair)
+    def _upload_async(self, files_count, path_groups):
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self._upload_many(files_count, path_groups))
+        loop.close()
 
-    @staticmethod
-    def _get_uploading_pair(paths):
-        name_key_pair = []
-        for i, path in enumerate(paths):
-            file = open(path, 'rb')
-            name_key_pair.append(
-                (
-                    'file{}'.format(i+1),
-                    ('photo{}.{}'.format(i, path[-3:]), file)
-                )
+    async def _upload_many(self, files_count, path_groups):
+        async with aiohttp.ClientSession() as session:
+            to_do = tuple(
+                self._upload_file(session, group) for group in path_groups
+            )
+            to_do_iter = tqdm(
+                asyncio.as_completed(to_do),
+                total=len(to_do) * FILES_IN_ONE_POST_REQUEST,
+                desc=self.title,
+                ascii=True,
+                unit=' photos',
             )
 
-        return name_key_pair
+            for coroutine in to_do_iter:
+                await coroutine
+
+    async def _upload_file(self, session, group):
+        data = self._get_uploading_data(group)
+        async with session.post(self.upload_server, data=data) as response:
+            if response.status == 200:
+                json_result = json.loads(await response.text())
+                await asyncio.sleep(0.6)
+                self.api.photos.save(album_id=self.album.id, **json_result)
 
     @staticmethod
-    def _close_files(group):
-        for i in group:
-            i[1][1].close()
+    def _get_uploading_data(group):
+        data = aiohttp.FormData()
+        for index, path in enumerate(group):
+            data.add_field(
+                'file{}'.format(index+1),
+                open(path, 'rb'),
+                filename='photo{}.{}'.format(index+1, path.split('.')[-1]),
+            )
+        return data
