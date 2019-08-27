@@ -1,13 +1,13 @@
 # reimaging
 reimaging is simple photo downloader/uploader for vk.com using CLI for UNIX.
 ### Requirements
-- pyvk (https://github.com/mkuznets/pyvk)
+- aiovk
 - tqdm
+- aiofiles
 
 ### Installation
 Just cd to source folder and type:
 ```sh
-$ pip install -r requirements.txt
 $ sudo python setup.py install
 ```
 

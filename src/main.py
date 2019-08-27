@@ -1,5 +1,6 @@
 import sys
-from pyvk.exceptions import *
+import asyncio
+from aiovk import exceptions
 
 from .argparser import createParser
 from .download import DownloadSession
@@ -9,7 +10,7 @@ from .list import get_list
 
 
 def main():
-    sys.tracebacklimit = 0
+    # sys.tracebacklimit = 0
 
     try:
         command_line_runner()
@@ -21,23 +22,14 @@ def main():
         print(e)
         sys.exit(1)
 
-    except AuthError as e:
+    except exceptions.VkAuthError as e:
         print('Authentication Error %d: %s' % (e.error_code, e.error_msg))
         sys.exit(1)
 
-    except InvalidToken as e:
-        print('Invalid Token Error %d: %s' % (e.error_code, e.error_msg))
-        sys.exit(1)
-
-    except ReqError as e:
+    except exceptions.VkAPIError as e:
         print('Request Error %d: %s' % (e.error_code, e.error_msg))
         print('Seems VK is denying all our requests')
         print('Try again later')
-        sys.exit(1)
-
-    except APIError as e:
-        print('API Error %d: %s' % (e.error_code, e.error_msg))
-        print('Check photos')
         sys.exit(1)
 
 
@@ -72,12 +64,15 @@ def download_command(namespace):
         session = DownloadSession(api=api, **vars(namespace))
         for album in session.albums:
             session.download_album(album)
+    session.close()
 
 
 def upload_command(namespace):
-    api = get_user_api()
+    from .core import UploadDriver
+    api = get_user_api(driver=UploadDriver)
     session = UploadSession(api=api, **vars(namespace))
     session.upload_photos()
+    session.close()
 
 
 def list_command(namespace):

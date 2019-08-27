@@ -1,27 +1,42 @@
-from pyvk import ClientAuth, API
+import asyncio
+from getpass import getpass
+from aiovk import TokenSession, API, ImplicitSession, drivers
 
 
 SERVICE_TOKEN = '66619e0066619e0066d3e34c266634f6666666' \
                                             '166619e003ea8d033c12d1a3d08e6fd55'
 APP_ID = 5597286
-API_VERSION = 5.80
-PHOTO_SCOPE = 4
 
 
 def get_service_api():
-    api = API(token=SERVICE_TOKEN, scope=PHOTO_SCOPE, version=API_VERSION)
+    session = TokenSession(access_token=SERVICE_TOKEN,)
+    api = API(session)
     return api
 
 
-def get_user_api():
-    auth = ClientAuth(app_id=APP_ID, scope=PHOTO_SCOPE)
-    auth.auth()
-    api = auth.api(version=API_VERSION, lang='en')
+def get_user_api(driver=drivers.HttpDriver):
+    user = input('Login: ')
+    password = getpass()
 
-    print("Authorization successful.")
+    session = ImplicitSession(
+        login=user,
+        password=password,
+        app_id=APP_ID,
+        scope='photos',
+        driver=driver()
+    )
+    api = API(session)
+
     return api
 
 
-if __name__ == '__main__':
-    api = get_user_api()
-    print(api.users.get(user_ids=1))
+if __name__ == "__main__":
+    async def get_user_albums(api):
+        id = await api.photos.getAlbums(owner_id=1)
+        print(id)
+
+    loop = asyncio.get_event_loop()
+    api = get_service_api()
+    loop.run_until_complete(get_user_albums(api))
+    loop.run_until_complete(api._session.close())
+    loop.close()

@@ -1,5 +1,3 @@
-import os
-
 from setuptools import setup
 import src
 
@@ -29,8 +27,13 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython'
+    ],
+    install_requires=[
+        'aiovk >= 3.0.0',
+        'tqdm >= 4.0.1',
+        'aiofiles >= 0.4.0'
     ],
     entry_points={
         'console_scripts':

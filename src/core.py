@@ -1,10 +1,23 @@
 import os
+import asyncio
+import aiovk
+
+from .mixins import LimitRateDriverMixin
+
+
+class UploadDriver(LimitRateDriverMixin, aiovk.drivers.HttpDriver):
+    request_per_period = 5
+    period = 2
 
 
 class BaseSession():
     def __init__(self, **kwargs):
         self.path = kwargs.get('path') or os.getcwd()
         self.api = kwargs.get('api')
+        self.loop = asyncio.get_event_loop()
+
+    def close(self):
+        self.loop.run_until_complete(self.api._session.close())
 
 
 class Album():
@@ -20,8 +33,8 @@ class Album():
     def link(self):
         return 'https://vk.com/{}_{}'.format(self.owner_id, self.id)
 
-    def get_photos(self):
-        response = self.api.photos.get(
+    async def get_photos(self):
+        response = await self.api.photos.get(
             owner_id=self.owner_id,
             album_id=self.id,
             photo_sizes=1,

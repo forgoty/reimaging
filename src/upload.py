@@ -7,7 +7,7 @@ import aiohttp
 from .core import BaseSession, Album
 
 
-FILES_IN_ONE_POST_REQUEST = 4
+FILES_IN_ONE_POST_REQUEST = 5
 EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
 
 
@@ -17,26 +17,32 @@ class UploadSession(BaseSession):
         self.title = kwargs.get('title')
 
         if kwargs.get('album_id'):
-            self.album = self.get_album_by_id(kwargs['album_id'])
+            self.loop.run_until_complete(
+                self.get_album_by_id(kwargs['album_id'])
+            )
         else:
-            self.album = self.create_album()
+            self.loop.run_until_complete(self.create_album())
 
-        self.upload_server = self._get_upload_server()
+        self.loop.run_until_complete(self._get_upload_server())
 
-    def get_album_by_id(self, id):
-        response = self.api.photos.getAlbums(
+    async def get_album_by_id(self, id):
+        response = await self.api.photos.getAlbums(
             albums_ids=[id],
         )
-        return Album(self.api, **response['items'][0])
+        self.album = Album(self.api, **response['items'][0])
 
-    def create_album(self):
-        album = self.api.photos.createAlbum(title=self.title, privacy=3,
-                                            comment_privacy=3)
-        return Album(self.api, **album)
+    async def create_album(self):
+        album = await self.api.photos.createAlbum(
+            title=self.title,
+            privacy_view='only_me',
+        )
+        self.album = Album(self.api, **album)
 
-    def _get_upload_server(self):
-        response = self.api.photos.getUploadServer(album_id=self.album.id)
-        return response['upload_url']
+    async def _get_upload_server(self):
+        response = await self.api.photos.getUploadServer(
+            album_id=self.album.id
+        )
+        self.upload_server = response['upload_url']
 
     def upload_photos(self):
         file_paths = self._get_file_paths()
@@ -67,25 +73,27 @@ class UploadSession(BaseSession):
             del paths[:step]
 
     def _upload_async(self, files_count, path_groups):
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(self._upload_many(files_count, path_groups))
-        loop.close()
+        self.loop.run_until_complete(
+            self._upload_many(files_count, path_groups)
+        )
 
     async def _upload_many(self, files_count, path_groups):
         async with aiohttp.ClientSession() as session:
             to_do = tuple(
                 self._upload_file(session, group) for group in path_groups
             )
-            to_do_iter = tqdm(
-                asyncio.as_completed(to_do),
-                total=len(to_do) * FILES_IN_ONE_POST_REQUEST,
+            pbar = tqdm(
+                total=files_count,
                 desc=self.title,
                 ascii=True,
                 unit=' photos',
+                unit_scale=1,
             )
 
-            for coroutine in to_do_iter:
+            for coroutine in asyncio.as_completed(to_do):
                 await coroutine
+                pbar.update(files_count/len(to_do))
+            pbar.close()
 
     async def _upload_file(self, session, group):
         data = self._get_uploading_data(group)
@@ -93,7 +101,10 @@ class UploadSession(BaseSession):
             if response.status == 200:
                 json_result = json.loads(await response.text())
                 await asyncio.sleep(0.6)
-                self.api.photos.save(album_id=self.album.id, **json_result)
+                await self.api.photos.save(
+                    album_id=self.album.id,
+                    **json_result
+                )
 
     @staticmethod
     def _get_uploading_data(group):
