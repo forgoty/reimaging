@@ -3,6 +3,7 @@ import asyncio
 import aiovk
 
 from .mixins import LimitRateDriverMixin
+from .auth import get_user_api, get_service_api
 
 
 class UploadDriver(LimitRateDriverMixin, aiovk.drivers.HttpDriver):
@@ -12,11 +13,25 @@ class UploadDriver(LimitRateDriverMixin, aiovk.drivers.HttpDriver):
 
 class BaseSession():
     def __init__(self, **kwargs):
-        self.path = kwargs.get('path') or os.getcwd()
-        self.api = kwargs.get('api')
-        self.loop = asyncio.get_event_loop()
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
-    def close(self):
+        self.path = kwargs.get('path') or os.getcwd()
+        self.loop = asyncio.get_event_loop()
+        self.api = self._get_api()
+
+    def _get_api(self):
+        if self.command == 'upload':
+            return get_user_api(driver=UploadDriver)
+        if self.auth and self.command in ('download', 'list'):
+            return get_user_api()
+        else:
+            return get_service_api()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
         self.loop.run_until_complete(self.api._session.close())
 
 
@@ -27,10 +42,10 @@ class Album():
             setattr(self, key, value)
 
     def __repr__(self):
-        return 'Album {}_{}'.format(self.owner_id, self.id)
+        return 'Album ({})'.format(self.title)
 
     @property
-    def link(self):
+    def vk_link(self):
         return 'https://vk.com/{}_{}'.format(self.owner_id, self.id)
 
     async def get_photos(self):

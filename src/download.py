@@ -9,16 +9,13 @@ from .core import BaseSession, Album
 
 class DownloadSession(BaseSession):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.user = kwargs.get('user')
-        self.system = kwargs.get('system') or 0
+    def connect(self):
         self.loop.run_until_complete(self.get_all_albums())
 
     async def get_all_albums(self):
         response = await self.api.photos.getAlbums(
             owner_id=self.user,
-            need_system=self.system
+            need_system=self.system or 0
         )
 
         self.albums = [Album(self.api, **item) for item in response['items']]

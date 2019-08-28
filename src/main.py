@@ -1,35 +1,31 @@
 import sys
-import asyncio
 from aiovk import exceptions
 
 from .argparser import createParser
 from .download import DownloadSession
 from .upload import UploadSession
-from .auth import get_user_api, get_service_api
 from .list import get_list
 
 
 def main():
-    # sys.tracebacklimit = 0
+    sys.tracebacklimit = 0
 
     try:
         command_line_runner()
     except KeyboardInterrupt:
-        print('Keyboard Interrupt')
+        print('\nKeyboard Interrupt')
         sys.exit(1)
 
     except OSError as e:
-        print(e)
+        print('OSError Error: {} '.format(str(e)))
         sys.exit(1)
 
     except exceptions.VkAuthError as e:
-        print('Authentication Error %d: %s' % (e.error_code, e.error_msg))
+        print('Authentication Error: {} '.format(str(e)))
         sys.exit(1)
 
     except exceptions.VkAPIError as e:
-        print('Request Error %d: %s' % (e.error_code, e.error_msg))
-        print('Seems VK is denying all our requests')
-        print('Try again later')
+        print('Request Error: {} '.format(str(e)))
         sys.exit(1)
 
 
@@ -51,37 +47,26 @@ def command_line_runner():
 
 
 def download_command(namespace):
-    if namespace.auth:
-        api = get_user_api()
-    else:
-        api = get_service_api()
-
     if namespace.album_id:
-        session = DownloadSession(api=api, **vars(namespace))
-        album = session.get_album_by_id(namespace.album_id)
-        session.download_album(album)
-    else:
-        session = DownloadSession(api=api, **vars(namespace))
-        for album in session.albums:
+        with DownloadSession(**vars(namespace)) as session:
+            session.connect()
+            album = session.get_album_by_id(session.album_id)
             session.download_album(album)
-    session.close()
+    else:
+        with DownloadSession(**vars(namespace)) as session:
+            session.connect()
+            for album in session.albums:
+                session.download_album(album)
 
 
 def upload_command(namespace):
-    from .core import UploadDriver
-    api = get_user_api(driver=UploadDriver)
-    session = UploadSession(api=api, **vars(namespace))
-    session.upload_photos()
-    session.close()
+    with UploadSession(**vars(namespace)) as session:
+        session.connect()
+        session.upload_photos()
 
 
 def list_command(namespace):
-    if namespace.auth:
-        api = get_user_api()
-    else:
-        api = get_service_api()
-
-    get_list(api=api, **vars(namespace))
+    get_list(**vars(namespace))
 
 
 if __name__ == '__main__':

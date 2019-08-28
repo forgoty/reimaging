@@ -12,22 +12,17 @@ EXTENSIONS = ('jpg', 'png', 'gif', 'bmp')
 
 
 class UploadSession(BaseSession):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.title = kwargs.get('title')
-
-        if kwargs.get('album_id'):
-            self.loop.run_until_complete(
-                self.get_album_by_id(kwargs['album_id'])
-            )
+    def connect(self):
+        if self.album_id:
+            self.loop.run_until_complete(self.get_album_by_id())
         else:
             self.loop.run_until_complete(self.create_album())
 
         self.loop.run_until_complete(self._get_upload_server())
 
-    async def get_album_by_id(self, id):
+    async def get_album_by_id(self):
         response = await self.api.photos.getAlbums(
-            albums_ids=[id],
+            albums_ids=[self.album_id],
         )
         self.album = Album(self.api, **response['items'][0])
 
@@ -100,7 +95,6 @@ class UploadSession(BaseSession):
         async with session.post(self.upload_server, data=data) as response:
             if response.status == 200:
                 json_result = json.loads(await response.text())
-                await asyncio.sleep(0.6)
                 await self.api.photos.save(
                     album_id=self.album.id,
                     **json_result
