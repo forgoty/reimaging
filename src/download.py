@@ -24,7 +24,6 @@ class DownloadSession(BaseSession):
         return next((album for album in self.albums if album.id == id), None)
 
     def download_album(self, album):
-        self.loop.run_until_complete(album.get_photos())
         os.makedirs(os.path.join(self.path, album.title), exist_ok=True)
         path_to_album = os.path.join(self.path, album.title)
         path_url_pairs = tuple(
@@ -34,7 +33,7 @@ class DownloadSession(BaseSession):
                     photo.url.split('/')[-1].replace('-', '')
                 ),
                 photo.url
-            ) for photo in album.photos
+            ) for photo in album.get_photos()
         )
 
         self.loop.run_until_complete(

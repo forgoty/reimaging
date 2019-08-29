@@ -21,11 +21,15 @@ def main():
         sys.exit(1)
 
     except exceptions.VkAuthError as e:
-        print('Authentication Error: {} '.format(str(e)))
+        error_code = e.args[0]['error_code']
+        error_msg = e.args[0]['error_msg']
+        print(f'Authentication  Error {error_code}: {error_msg}')
         sys.exit(1)
 
     except exceptions.VkAPIError as e:
-        print('Request Error: {} '.format(str(e)))
+        error_code = e.args[0]['error_code']
+        error_msg = e.args[0]['error_msg']
+        print(f'Request Error {error_code}: {error_msg}')
         sys.exit(1)
 
 
