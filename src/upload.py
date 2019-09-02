@@ -74,9 +74,9 @@ class UploadSession(BaseSession):
 
     async def _upload_many(self, files_count, path_groups):
         async with aiohttp.ClientSession() as session:
-            to_do = tuple(
+            to_do = [
                 self._upload_file(session, group) for group in path_groups
-            )
+            ]
             pbar = tqdm(
                 total=files_count,
                 desc=self.title,

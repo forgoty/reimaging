@@ -12,7 +12,7 @@ def main():
 
     try:
         command_line_runner()
-    except KeyboardInterrupt:
+    except (EOFError, KeyboardInterrupt):
         print('\nKeyboard Interrupt')
         sys.exit(1)
 
@@ -21,15 +21,11 @@ def main():
         sys.exit(1)
 
     except exceptions.VkAuthError as e:
-        error_code = e.args[0]['error_code']
-        error_msg = e.args[0]['error_msg']
-        print(f'Authentication  Error {error_code}: {error_msg}')
+        print(f'Authentication Error: {e}')
         sys.exit(1)
 
     except exceptions.VkAPIError as e:
-        error_code = e.args[0]['error_code']
-        error_msg = e.args[0]['error_msg']
-        print(f'Request Error {error_code}: {error_msg}')
+        print(f'Request Error: {e}')
         sys.exit(1)
 
 

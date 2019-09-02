@@ -26,15 +26,14 @@ class DownloadSession(BaseSession):
     def download_album(self, album):
         os.makedirs(os.path.join(self.path, album.title), exist_ok=True)
         path_to_album = os.path.join(self.path, album.title)
-        path_url_pairs = tuple(
-            (
-                os.path.join(
-                    path_to_album,
-                    photo.url.split('/')[-1].replace('-', '')
-                ),
-                photo.url
+        path_url_pairs = [(
+            os.path.join(
+                path_to_album,
+                photo.url.split('/')[-1].replace('-', '')
+            ),
+            photo.url
             ) for photo in album.get_photos()
-        )
+        ]
 
         self.loop.run_until_complete(
             _download_many(album.title, path_url_pairs)
@@ -43,9 +42,9 @@ class DownloadSession(BaseSession):
 
 async def _download_many(title, path_url_pairs):
     async with aiohttp.ClientSession() as client:
-        to_do = tuple(
+        to_do = [
             _download_one(client, path, url) for path, url in path_url_pairs
-        )
+        ]
         to_do_iter = tqdm(
             asyncio.as_completed(to_do),
             total=len(path_url_pairs),

@@ -1,12 +1,12 @@
 import os
 import asyncio
-import aiovk
 
 from aiovk.mixins import LimitRateDriverMixin
+from aiovk.drivers import HttpDriver
 from .auth import get_user_api, get_service_api
 
 
-class SoftHttpDriver(LimitRateDriverMixin, aiovk.drivers.HttpDriver):
+class SoftHttpDriver(LimitRateDriverMixin, HttpDriver):
     request_per_period = 3
     period = 1.3
 
@@ -21,9 +21,9 @@ class BaseSession():
         self.api = self._get_api()
 
     def _get_api(self):
-        if self.command in ('upload', 'download'):
-            return get_user_api(driver=SoftHttpDriver)
-        if self.auth and self.command == 'list':
+        if self.command == 'upload':
+            return get_user_api(driver=SoftHttpDriver())
+        if self.auth and self.command in ('list', 'download'):
             return get_user_api()
         else:
             return get_service_api()
@@ -44,7 +44,7 @@ class Album():
             setattr(self, key, value)
 
     def __repr__(self):
-        return 'Album ({})'.format(self.title)
+        return '<Album ({})>'.format(self.title)
 
     @property
     def vk_link(self):
@@ -88,7 +88,7 @@ class Photo():
             setattr(self, key, value)
 
     def __repr__(self):
-        return 'Photo {}_{}'.format(self.owner_id, self.id)
+        return '<Photo {}_{}>'.format(self.owner_id, self.id)
 
     @property
     def vk_link(self):
