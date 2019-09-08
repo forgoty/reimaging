@@ -47,14 +47,12 @@ def command_line_runner():
 
 
 def download_command(namespace):
-    if namespace.album_id:
-        with DownloadSession(**vars(namespace)) as session:
-            session.connect()
+    with DownloadSession(**vars(namespace)) as session:
+        session.connect()
+        if namespace.album_id:
             album = session.get_album_by_id(session.album_id)
             session.download_album(album)
-    else:
-        with DownloadSession(**vars(namespace)) as session:
-            session.connect()
+        else:
             for album in session.albums:
                 session.download_album(album)
 
