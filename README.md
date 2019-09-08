@@ -37,8 +37,6 @@ If you want to download system albums, but not them all, you can use **--system*
 * **-7** - for wall photos
 * **-15** - for saved photos
 
-Unfortunately, VK API do not allow to download more than 1000 photos.
-
 ### Launch Examples
 ```sh
 $ reimaging download -u 53083705 -p ~/download-folder --album_id 255217256 #download single album of owner by ID`s
@@ -51,6 +49,10 @@ $ reimaging upload -p <path> -t <title> #Upload photos from "path" to Album with
 $ reimaging upload -p <path> --album_id <album_id> # Update Album with "album_id" with photos form "path"
 $ reimaging list -a --system # View album list with system albums
 ```
+
+### Notes
+Unfortunatly, when calling upload command with 500 and more photos you can get **Flood control** error.
+I will fix it in future releases.
 
 ### Todos
 
