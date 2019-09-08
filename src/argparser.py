@@ -68,23 +68,15 @@ def create_download_parser(subparsers):
     )
 
     download_group.add_argument(
-        '-w',
-        '--workers',
-        type=int,
-        help='Number of workers'
-    )
-
-    download_group.add_argument(
         '--system',
         action='store_const',
-        const=True,
+        const=1,
         help='''Download system albums. If album ID is not set,
                 download all system albums
                 Album ID for profile photos = -6.
                 Album ID for wall photos = -7.
                 Album ID for saved photos = -15.'''
         )
-
 
     download_group.add_argument('--help', '-h', action='help', help='Help')
 
@@ -102,13 +94,6 @@ def create_upload_parser(subparsers):
         '-p',
         '--path',
         help='Choose photo path for upload'
-    )
-
-    upload_group.add_argument(
-        '-w',
-        '--workers',
-        type=int,
-        help='Number of workers'
     )
 
     upload_subgroup = upload_group.add_mutually_exclusive_group()
@@ -153,7 +138,7 @@ def create_list_parser(subparsers):
     list_group.add_argument(
         '--system',
         action='store_const',
-        const=True,
+        const=1,
         help='List system albums'
     )
 

@@ -1,8 +1,6 @@
 import os
-from shutil import rmtree
 from unittest import TestCase
 
-from src import auth
 from src.list import get_list
 
 
@@ -20,7 +18,7 @@ class ListTest(TestCase):
         pass
 
     def test_list(self):
-        kwargs = {'api': auth.get_service_api(), 'user': 1}
+        kwargs = {'user': 1, 'command': 'list', 'auth': False, 'system': 0}
         try:
             get_list(**kwargs)
         except:

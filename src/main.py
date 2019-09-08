@@ -1,10 +1,9 @@
 import sys
-from pyvk.exceptions import *
+from aiovk import exceptions
 
 from .argparser import createParser
 from .download import DownloadSession
 from .upload import UploadSession
-from .auth import get_user_api, get_service_api
 from .list import get_list
 
 
@@ -13,31 +12,20 @@ def main():
 
     try:
         command_line_runner()
-    except KeyboardInterrupt:
-        print('Keyboard Interrupt')
+    except (EOFError, KeyboardInterrupt):
+        print('\nKeyboard Interrupt')
         sys.exit(1)
 
     except OSError as e:
-        print(e)
+        print('OSError Error: {} '.format(str(e)))
         sys.exit(1)
 
-    except AuthError as e:
-        print('Authentication Error %d: %s' % (e.error_code, e.error_msg))
+    except exceptions.VkAuthError as e:
+        print(f'Authentication Error: {e}')
         sys.exit(1)
 
-    except InvalidToken as e:
-        print('Invalid Token Error %d: %s' % (e.error_code, e.error_msg))
-        sys.exit(1)
-
-    except ReqError as e:
-        print('Request Error %d: %s' % (e.error_code, e.error_msg))
-        print('Seems VK is denying all our requests')
-        print('Try again later')
-        sys.exit(1)
-
-    except APIError as e:
-        print('API Error %d: %s' % (e.error_code, e.error_msg))
-        print('Check photos')
+    except exceptions.VkAPIError as e:
+        print(f'Request Error: {e}')
         sys.exit(1)
 
 
@@ -59,34 +47,24 @@ def command_line_runner():
 
 
 def download_command(namespace):
-    if namespace.auth:
-        api = get_user_api()
-    else:
-        api = get_service_api()
-
-    if namespace.album_id:
-        session = DownloadSession(api=api, **vars(namespace))
-        album = session.get_album_by_id(namespace.album_id)
-        session.download_album(album)
-    else:
-        session = DownloadSession(api=api, **vars(namespace))
-        for item in session.albums:
-            session.download_album(item)
+    with DownloadSession(**vars(namespace)) as session:
+        session.connect()
+        if namespace.album_id:
+            album = session.get_album_by_id(session.album_id)
+            session.download_album(album)
+        else:
+            for album in session.albums:
+                session.download_album(album)
 
 
 def upload_command(namespace):
-    api = get_user_api()
-    session = UploadSession(api=api, **vars(namespace))
-    session.upload_photos()
+    with UploadSession(**vars(namespace)) as session:
+        session.connect()
+        session.upload_photos()
 
 
 def list_command(namespace):
-    if namespace.auth:
-        api = get_user_api()
-    else:
-        api = get_service_api()
-
-    get_list(api=api, **vars(namespace))
+    get_list(**vars(namespace))
 
 
 if __name__ == '__main__':
