@@ -32,6 +32,7 @@ setup(
     ],
     install_requires=[
         'aiovk >= 3.0.0',
+        'aiohttp <= 3.6.2',
         'tqdm >= 4.0.1',
         'aiofiles >= 0.4.0'
     ],
